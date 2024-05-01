@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 
-struct short_flags fl{
+typedef struct {
     int b = 0;
     int e = 0;
     int E = 0;
@@ -10,4 +11,4 @@ struct short_flags fl{
     int s = 0;
     int t = 0;
     int T = 0;
-};
+} short_flags;
