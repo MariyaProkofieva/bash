@@ -23,4 +23,4 @@ typedef struct {
 void open_close(char *filename, shortopts* flags);
 
 
-void cat(shortopts* flags, FILE *f, int ch);
+void cat(shortopts* flags, FILE *f);
