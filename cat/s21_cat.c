@@ -1,78 +1,138 @@
-#include s21_cat.h
+#include "s21_cat.h"
 
 int main (int argc, char *argv[]){
+   
+    int opt, loginindex = 0;
+    shortopts flags = {0};
 
-for(int i = 1; i < argc; i++){ //начинаем с argv[1], тк в argv[0] находится
-                              //команда запуска нашего файла cat 
-    print_file(argv[i]); // происходит печать каждого файла командной строки
-}  
+    while(opt!=-1){//фун-я возвращает -1 в конце списка опций
 
 
+        opt = getopt_long(argc, argv, "beEnstTv", longopts, &loginindex);//index нужен фун-и для обозначения длины длинного флага, он указывает на 
+        //переменную хранящую индекс
+
+            switch (opt) {
+                //printf("str16\n");
+                case 'b':
+                flags.b = 1;
+                break;
+                case 'E':
+                flags.E = 1;
+                break;
+                case 'e':
+                flags.e = 1;
+                flags.v = 1;
+
+                break;
+                case 'v': 
+                flags.v = 1;
+                break;
+                case 'n':
+                flags.n = 1;
+                break;
+                case 's':
+                flags.s = 1;
+                break;
+                case 't':
+                flags.t = 1;
+                break;
+                case 'T':
+                flags.T = 1;
+                break;
+            }
+
+            //что если флаг введен некорректный 
+            //если флага нет то не запускать cat и ввести в код переменную для отсутствия флага
+    }
+
+     //printf("%d\n", flags.b);
+
+
+    for(int i = optind; i < argc; i++){ //optind это переменная из getopt, указывает на следующий аргумент после флагов 
+                //команда запуска нашего файла cat 
+        open_close(argv[i], &flags); // происходит печать каждого файла командной строки
+    }  
+
+        
     
     return 0;
 }
 
 
 
-void print_file(char *name, fl) { // функция чтение и вывод файла
-    FILE *file = fopen(name, "rt"); //открытие текстового файла
+void open_close(char *filename, shortopts *flags) { // функция чтение и вывод файла
+    FILE *file = fopen(filename, "rt"); //открытие текстового файла
+
     if (file != NULL){ // если файл открылся 
-        int ch = fgetc(file); // считывание первого символа ASCII в файле 
-        while(ch != EOF){ //пока символ это не конец файла
-            if(fl.e && ch=='\n'){
-                putchar("$");
-            } 
-            putc(ch, stdout); //печатать символ
-            сh = fgetc(f); // считываем новый символ и переписываем значение символа для печати  
-        }
-
-    fclose(file);
-
+        int ch = fgetc(file); // считывание первого символа ASCII в файле
+        cat(flags, file, ch); // ????? нужно ли передавать ch как укаазатель ????
     }
+
+        fclose(file);
 
 }
 
-void parser_flags(){ //необходим парсинг флагов, которые могут быть в комбинации и одному флагу 
-// может соответствовать несколько вариаций символов 
 
-// ??????? ДЛИННЫЕ ФЛАГИ
+void cat(shortopts *flags, FILE *file, int ch){ 
 
-// тест-кейсы: vv / tt / TT / eV 
+//вставить эту функцию после открытия файла
+    
+    int numb_line = 1; // для флага б и н
+    int start_str = 1; 
 
-    for(int i = 1, j=0; i < argc, j < strlen(argv[i]); i++, j++){ // пройдемся по аргументам
-        if( (argv[i][0]!= '-') || (strcmp(argc[i]; "-")) || strcmp(argc[i]; "--") ){
-            break; //исключаем если первый элемент строки не -, если вся строка это -, если вся строка --
-        } else {
-            
-            switch (argv[i][j]) {
-                case 'b':
-                fl.b = 1;
-                break;
-                case 'E':
-                fl.E = 1;
-                break;
-                case 'e':
-                fl.e = 1;
-                break;
-                case 'v': 
-                fl.v = 1;
-                break;
-                case 'n':
-                fl.n = 1;
-                break;
-                case 's':
-                fl.s = 1;
-                break;
-                case 't':
-                fl.t = 1;
-                break;
-                case 'T':
-                fl.T = 1;
-                break;
+    while(ch != EOF){ //пока символ это не конец файла
 
+        if(flags->b){
+
+            if(ch != '\n' && ch != EOF && start_str){
+                printf("%6d\t", numb_line); 
+                numb_line++;
+                start_str = 0;
             }
 
         }
 
+        if(flags->E){
+
+            if(ch == '\n'){
+                printf("$");
+            }
+        }
+
+        if(flags->s){
+            if(ch == '\n' && fgetc(file) == '\n' ){
+                while(ch == '\n'){
+                    ch = fgetc(file);
+                }
+            }
+        }
+
+        if(flags->n && !flags->b){
+
+            if(start_str){ 
+
+                printf("%6d\t", numb_line);
+                numb_line++;
+                start_str = 0;
+            }
+            
+        }
+        
+        putc(ch, stdout); 
+        ch = fgetc(file);
+
+        if(ch == '\n'){
+            start_str = 1;
+        }
+                    
     }
+          
+
 }
+
+   
+
+
+
+
+

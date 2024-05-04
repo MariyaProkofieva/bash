@@ -1,13 +1,26 @@
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 
-struct short_flags fl{
-    int b = 0;
-    int e = 0;
-    int E = 0;
-    int v = 0;
-    int n = 0;
-    int s = 0;
-    int t = 0;
-    int T = 0;
+const struct option longopts[] = {
+    {"number-nonblank", no_argument, NULL, 'b'},
+    {"number", no_argument, NULL, 'n'},
+    {"squeeze-blank", no_argument, NULL, 's'},
+    {0, 0, 0, 0}
 };
+
+typedef struct {
+    int b;
+    int e;
+    int E;
+    int v;
+    int n;
+    int s;
+    int t;
+    int T;
+} shortopts;
+
+void open_close(char *filename, shortopts* flags);
+
+
+void cat(shortopts* flags, FILE *f, int ch);
