@@ -47,7 +47,7 @@ do
 done
 
 # 1 параметр
-for var1 in b e n s t
+for var1 in b e n s t v
 do
     for i in "${tests[@]}"
     do
@@ -57,9 +57,9 @@ do
 done
 
 # 2 параметра
-for var1 in b e n s t
+for var1 in b e n s t v
 do
-    for var2 in b e n s t
+    for var2 in b e n s t v
     do
         if [ $var1 != $var2 ]
         then
@@ -73,11 +73,11 @@ do
 done
 
 # 3 параметра
-for var1 in b e n s t
+for var1 in b e n s t v
 do
-    for var2 in b e n s t
+    for var2 in b e n s t v
     do
-        for var3 in b e n s t
+        for var3 in b e n s t v
         do
             if [ $var1 != $var2 ] && [ $var2 != $var3 ] && [ $var1 != $var3 ]
             then
@@ -92,13 +92,13 @@ do
 done
 
 # 4 параметра
-for var1 in b e n s t
+for var1 in b e n s t v
 do
-    for var2 in b e n s t
+    for var2 in b e n s t v
     do
-        for var3 in b e n s t
+        for var3 in b e n s t v
         do
-            for var4 in b e n s t
+            for var4 in b e n s t v
             do
                 if [ $var1 != $var2 ] && [ $var2 != $var3 ] \
                 && [ $var1 != $var3 ] && [ $var1 != $var4 ] \

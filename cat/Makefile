@@ -13,7 +13,7 @@ test:
 run:
 	./s21_cat_test 1
 
-rebuild: clean s21_cat test
+rebuild: clean s21_cat
 
 clean:
 	rm -rf s21_cat test

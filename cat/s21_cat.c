@@ -110,7 +110,7 @@ void cat(shortopts *flags, FILE *file){
                         numb_line++;
                         start_str = 0;
                     }
-                } else if(flags->n){
+                } else if(flags->n && ch != EOF){
 
                     if(prev == '\n'){ 
 
@@ -123,7 +123,7 @@ void cat(shortopts *flags, FILE *file){
             }
 
 
-                if( flags->v && ch != '\n' && ch != '\t'){
+                if( flags->v && ch != '\n' && ch != '\t' && ch != EOF){
                         if(ch>127){
                             printf("M-");
                             ch -= 128;
@@ -132,7 +132,7 @@ void cat(shortopts *flags, FILE *file){
                         if(ch == 127 || ch < 32){
                             printf("^");
                             if(ch == 127){
-                                ch -= 63;
+                                ch -= 64;
                             } else {
                                 ch += 64;
                             }
@@ -141,13 +141,12 @@ void cat(shortopts *flags, FILE *file){
                 } 
                 
                 
-                if(flags->e && ch == '\n'){
-
-                    if(flags->b && prev == '\n'){
-                        printf("\t$");
+                if(flags->e && ch == '\n' && ch != EOF){
+                    if(flags->b && prev == '\n' && ch != EOF){
+                        printf("      \t$");
                     } else {
-                            printf("$");
-                        }
+                        printf("$");
+                    }
                 }
 
                 
