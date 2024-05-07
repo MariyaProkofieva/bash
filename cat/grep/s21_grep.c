@@ -58,12 +58,13 @@ int main(int argc, char *argv[]) {
 
 
 
-void process_file(*char filename){
+void process_file(char *filename, char *pattern, flags fl){
     FILE *file = fopen(filename, "r");
     if(file != NULL){
         regex_t regex; 
         compile_reg(&regex,);
 
+//ЗДЕСЬ БУДЕМ ЧИТАТЬ 
         fclose(file);
     } else if (!fl.s){ /// этот флаг для подавления сообщения об ошибке 
         printf("s21_grep: %s: No such file or directory\n", filename);
