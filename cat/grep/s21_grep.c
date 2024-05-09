@@ -3,7 +3,7 @@
 void parser(flags *fl, int argc, char *argv[]); 
 void process_file(char *filename, char *pattern, flags *fl);
 void compile_reg(regex_t *regex, char *pattern, flags *fl);
-void change_linebreak(char **line);
+void change_linebreak(char *line);
 
 
 
@@ -19,13 +19,19 @@ int main(int argc, char *argv[]) {
 
     //printf("str14\n");
     parser(&fl, argc, argv);
+    printf("%d\n", 2);
     char *pattern = malloc((strlen(argv[optind])+1) * sizeof(char));//+1 для хранения /0, чтобы функции не читали строку вне ее массива
+    printf("%d\n", 3);
+
     //printf("str16\n");
     if (pattern == NULL) {
     perror("Ошибка выделения памяти");
     exit(EXIT_FAILURE);
 }
     strcpy(pattern, argv[optind]);
+    printf("%d\n", 4);
+    printf("%s\n", pattern);
+
     for(int i = optind; i < argc; i++){ //optind это переменная из getopt, указывает на следующий аргумент после флагов 
         //printf("str18\n");
         process_file(argv[i], pattern, &fl); 
@@ -93,22 +99,24 @@ void process_file(char *filename, char *pattern, flags *fl){
     size_t length = 0; 
 
     if(file != NULL){
-        //printf("82 str\n");
+        printf("82 str\n");
         regex_t regex; 
         compile_reg(&regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
-        //printf("85 str\n");
+        printf("85 str\n");
     
 
         while( (getline(&line, &length, file)) != -1){ //читаем построчно
-        //printf("89 str\n");
-            change_linebreak(&line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
+            printf("86 str\n");
+            change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
+            printf("87 str\n");
  
-            int status = regexec(&regex, line, 1, NULL, 0); //ноль если было совпадение 
+            int status = regexec(&regex, line, 0, NULL, 0); //ноль если было совпадение 
              printf("%d\n", status);
 
                 if(!status){
                     printf("%s\n", line);
                 }
+            printf("88 str\n");
 
         }
 
@@ -128,17 +136,18 @@ void process_file(char *filename, char *pattern, flags *fl){
 void compile_reg(regex_t *regex, char *pattern, flags *fl){
     if(regcomp(regex, pattern, fl->i)){
         printf("PIZDA");
+        exit(1);
     }
 
     //добавить про флаг и про ошибку компиляции в случае не 0
     //printf("116 str\n");
 }
 
-void change_linebreak(char **line){
+void change_linebreak(char *line){
 
-    int end_str = (int)strlen(*line) - 1; //индекс 
-    if((*line)[end_str] == '\n'){
-       (*line)[end_str] = '\0';
+    int end_str = (int)strlen(line) - 1; //индекс 
+    if(line[end_str] == '\n'){
+       line[end_str] = '\0';
     }
 
 }
