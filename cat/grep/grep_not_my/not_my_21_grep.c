@@ -86,8 +86,12 @@ void process_file_pattern(Params *params, char **pattern, char *optarg) {//эт�
   FILE *file = fopen(optarg, "r"); //открытие файла для шаблонов 
 
   if (file != NULL) {//если существует 
-    char *line = NULL; //строка из этого файла 
-    size_t length = 0;//ее размер 
+    char *line = NULL; //строка из этого файла для гетлайн
+    size_t length = 0;//ее размер для гетлайн
+    //size_t - целочисленный тип для хранения результатов операторов sizeof, для 
+    //индексации массивов
+    //он может хранить макс размер массива
+    //предпочтительнее инт, чтобы в циклах не было переполненияя
 
     while ((getline(&line, &length, file)) != -1) {//пока не конец файла считываем по строчке в line из файла 
       add_pattern(pattern, line); //добавляем считанную строчку в паттерн, то есть шаблон поиска 
@@ -152,8 +156,8 @@ void process_file(Flags flags, Params *params, const char *filename,
   }
 }
 
-void regex_compile(Flags flags, Params *params, regex_t *regex, char *pattern) {
-  if (regcomp(regex, pattern, flags.i ? REG_ICASE : 0)) {
+void regex_compile(Flags flags, Params *params, regex_t *regex, char *pattern) {//компиляция регулярного выражения, regex_t *regex будет содержать результат компиляции 
+  if (regcomp(regex, pattern, flags.i ? REG_ICASE : 0)) {//
     params->error = true;
     fprintf(stderr, "Error compiling regex\n");
   }
@@ -199,16 +203,18 @@ void process_flag_o(Flags flags, Params *params, FILE *file, regex_t *regex,
 
 void process_file_lines(Flags flags, Params *params, FILE *file, regex_t *regex,
                         const char *filename) {
-  char *line = NULL;
-  size_t length = 0;
-  int line_count = 0, match_count = 0;
+  char *line = NULL;//строка для чтения из файла для гет лайн, нул чтобы 
+  //память под нее выделялась
+  size_t length = 0;//размер для строки 
+  int line_count = 0, match_count = 0;//счет линий и счет совпадений
 
-  while ((getline(&line, &length, file)) != -1) {
-    line_count++;
+  while ((getline(&line, &length, file)) != -1) {//пока не конец
+    line_count++;//каждая линия - счетчик линий увеличивается 
 
-    replace_linebreak(&line);
+    replace_linebreak(&line);// \n меняется на \0 за счет особого считывания регекс, это 
+    //последний аргумент фун-и с таким параметром 
 
-    int status = regexec(regex, line, 0, NULL, 0);
+    int status = regexec(regex, line, 0, NULL, 0); //= 0 если было совпадение 
 
     if (!status ^ flags.v) {
       if (flags.l) {
