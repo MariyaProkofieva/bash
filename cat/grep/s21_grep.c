@@ -3,33 +3,37 @@
 void parser(flags *fl, int argc, char *argv[]); 
 void process_file(char *filename, char *pattern, flags *fl);
 void compile_reg(regex_t *regex, char *pattern, flags *fl);
-void change_linebreak(char **line);
-
+void change_linebreak(char *line);
+void c_flag(int match_count);
+void cv_flag(int match_count_cv);
 
 
 int main(int argc, char *argv[]) {
   
 
     flags fl = {0};
-     //  НУЖНО ВИДИМО ВЫДЕЛИТЬ ПАМЯТЬ ПОД ПАТЕРН И ЕГО СЧИТАТЬ В КОМАНДНОЙ СТРОКИ В ПАТЕРН 
-    //ТО ЕСТЬ ДЕЛАТЬ ЭТО ПОСЛЕ ПАРСИНГА С ОПТИНД ДО ПРОБЕЛА?  
-//делать через str_cat
-
+     
 
 
     //printf("str14\n");
     parser(&fl, argc, argv);
+ 
     char *pattern = malloc((strlen(argv[optind])+1) * sizeof(char));//+1 для хранения /0, чтобы функции не читали строку вне ее массива
+  
+
     //printf("str16\n");
     if (pattern == NULL) {
-    perror("Ошибка выделения памяти");
-    exit(EXIT_FAILURE);
+    //perror("Ошибка выделения памяти");
+    //exit(EXIT_FAILURE);
 }
     strcpy(pattern, argv[optind]);
+  
+   
+
     for(int i = optind; i < argc; i++){ //optind это переменная из getopt, указывает на следующий аргумент после флагов 
-        //printf("str18\n");
+    
         process_file(argv[i], pattern, &fl); 
-        //printf("str19\n");
+
     }
     
 
@@ -41,9 +45,9 @@ int main(int argc, char *argv[]) {
 
  void parser(flags *fl, int argc, char *argv[]){
         int opt = 0;
-        //printf("str29\n");
+      
         while(opt!= -1){
-        //printf("str32\n");
+      
             opt = getopt(argc, argv, "e:f:ivclnhso"); // : требует аргумента 
             switch(opt){
             
@@ -86,35 +90,50 @@ int main(int argc, char *argv[]) {
 
 
 void process_file(char *filename, char *pattern, flags *fl){
-    //printf("75 str\n");
+  
     FILE *file = fopen(filename, "r");
-    //printf("77 str\n");
+
     char *line = NULL;
     size_t length = 0; 
+    int match_count = 0; // for flag c
+    int match_count_cv = 0;
 
     if(file != NULL){
-        //printf("82 str\n");
+  
         regex_t regex; 
         compile_reg(&regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
-        //printf("85 str\n");
+   
+        
     
 
         while( (getline(&line, &length, file)) != -1){ //читаем построчно
-        //printf("89 str\n");
-            change_linebreak(&line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
+         
+            change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
+     
  
-            int status = regexec(&regex, line, 1, NULL, 0); //ноль если было совпадение 
-             printf("%d\n", status);
-
+            int status = regexec(&regex, line, 0, NULL, 0); //ноль если было совпадение 
+          
                 if(!status){
-                    printf("%s\n", line);
+                    match_count++;
+                } else {
+                    match_count_cv++;
                 }
 
+
+
+                if(!status && !fl->c && !fl->v){
+                    printf("%s\n", line);
+                } else if (status && fl->v && !fl->c){
+                    printf("%s\n", line);
+                }
+          
+
         }
-
-        //хочу сделать регекс с записью в массив совпадений в его
-        //аргументах 
-
+        if(fl->c && !fl->v){
+        c_flag(match_count);
+        } else if (fl->c && fl->v){
+            cv_flag(match_count_cv);
+        }
 
         regfree(&regex);
         fclose(file);
@@ -126,19 +145,40 @@ void process_file(char *filename, char *pattern, flags *fl){
 
 
 void compile_reg(regex_t *regex, char *pattern, flags *fl){
-    if(regcomp(regex, pattern, fl->i)){
+    if(regcomp(regex, pattern, fl->i ? REG_ICASE : REG_EXTENDED)){//если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
         printf("PIZDA");
+        exit(1);
     }
 
-    //добавить про флаг и про ошибку компиляции в случае не 0
+    //добавить про флаг i и про ошибку компиляции в случае не 0
+    //reg extended
     //printf("116 str\n");
 }
 
-void change_linebreak(char **line){
+void change_linebreak(char *line){
 
-    int end_str = (int)strlen(*line) - 1; //индекс 
-    if((*line)[end_str] == '\n'){
-       (*line)[end_str] = '\0';
+    int end_str = (int)strlen(line) - 1; //индекс 
+    if(line[end_str] == '\n'){
+       line[end_str] = '\0';
     }
 
 }
+
+void c_flag(int match_count){
+    printf("%d", match_count);
+}
+
+void e_flag(){
+
+}
+
+void cv_flag(int match_count_cv){
+    printf("%d", match_count_cv);
+}
+//относительно работаю флаги:
+// i
+// c
+// c + i
+// v
+// v + c +i 
+// начат s
