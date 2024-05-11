@@ -37,8 +37,7 @@ int main(int argc, char *argv[]) {
     }
     
 
-    //НАДО ДОБАВИТЬ В ШАБЛОН НАЧАЛО И КОНЕЦ СТРОКИ ^$
-
+    
     return 0;
 
 }
@@ -175,6 +174,41 @@ void e_flag(){
 void cv_flag(int match_count_cv){
     printf("%d", match_count_cv);
 }
+
+void f_flag(char *pattern, char *optarg) {//это для файла флага f, optarg - имя файла f
+    FILE *file = fopen(optarg, "r"); //открытие файла для шаблонов. optarg хранит аргумент флага
+    if(file){
+
+        char *line = NULL;
+        size_t length = 0; 
+        char *pattern_str;
+
+         while( (getline(&line, &length, file)) != -1){
+         pattern_str = malloc(strlen(line) + 1);
+         strcpy(pattern_str, line);
+         replace_linebreak(&copy_line);
+
+
+
+        }
+
+    } else {
+        printf("s21_grep: %s: No such file or directory\n", optarg);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //относительно работаю флаги:
 // i
 // c
