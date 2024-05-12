@@ -9,24 +9,23 @@ void cv_flag(int match_count_cv);
 void add_template(flags *fl, char *template_file);
 
 
-int main(int argc, char *argv[]) {
-    char *input_files[argc];
-    char *pattern = "to del";
-    flags fl = {0};
+int main(int argc, char *argv[]) {//
+    char *input_files[argc]; //массив с указателями на отдельные строки имен файлов. каждый указатель ссылается на строку конкретного файла 
+    // ??? почему аргс если файлов может быть меньше аргс или это типа макс допустимый
+    char *pattern = "to del"; //шаблон 
+    flags fl = {0}; //зануляем инты
     
-    fl.input_files = input_files;
+    fl.input_files = input_files;//чтобы обращаться к структуре с **input_files, мы приравниваем структуру **input_files к *input_files 
+    //т.е мы говорим на что ссылается **. указатели ** cсылаются на массив указателей *[ ], которые ссылаются на первые элементы строк 
     
-
-
-    //printf("str14\n");
-    parser(&fl, argc, argv);
+    parser(&fl, argc, argv); //парсим
     // printf("optind=%d %s\n", optind, argv[optind]);
-    if (argv[optind]) {
+    if (argv[optind]) { //существует ли этот аргумент строки после парсинга, optind  
         fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));//+1 для хранения /0, чтобы функции не читали строку вне ее массива
         strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
         fl.counter_patterns++;
     }
-    // печатает все паттерны из fl.patterns
+    // печатает все паттерны из fl.patterns 
     for (int i = 0; i < fl.counter_patterns; i++)
         printf("%d. %s\n", i, fl.patterns[i]);
 

@@ -16,7 +16,8 @@ typedef struct {
     int s;
     int f;
     int o;
-    char *patterns[10000];
-    char **input_files;
-    int counter_patterns;
+    char *patterns[10000];//массив для шаблонов 
+    char **input_files; //создание двумерного массива для хранения файлов, чтобы динамически управлять. хранит указатели которые
+    //ссылаются на указатели отдельных строк  
+    int counter_patterns;// счетчик шаблонов 
 } flags;
