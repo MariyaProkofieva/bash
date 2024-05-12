@@ -8,6 +8,18 @@ void c_flag(int match_count);
 void cv_flag(int match_count_cv);
 void add_template(flags *fl, char *template_file);
 
+//не получается сделать поиск строки с пробелами непосредственно самим оригинальным grep -- а нужно ли делать экранирование с флагом е? -- мой код ловит все шаблоны а греп нет
+
+//оригинальный греп ожидает после флага обязательно указания файла, нельзя написать: флаг-шаблон флаг-шаблон файл 
+
+//можно: -флаг шаблон файл -флаг шаблон 
+//можно: файл -флаг шаблон
+//можно: файл -флаг шаблон -флаг шаблон
+//можно: -флаг шаблон файл -флаг шаблон файл2
+
+//необычный вывод оригинального грепа в случае одного файла известного и одного неизвестного (пример в тг)
+//в случае поиска в двух файлах греп выводит имя каждого файла и строки совпадений в этих файлах
+
 
 int main(int argc, char *argv[]) {//
     char *input_files[argc]; //массив с указателями на отдельные строки имен файлов. каждый указатель ссылается на строку конкретного файла 
@@ -20,12 +32,16 @@ int main(int argc, char *argv[]) {//
     
     parser(&fl, argc, argv); //парсим
     // printf("optind=%d %s\n", optind, argv[optind]);
-    if (argv[optind]) { //существует ли этот аргумент строки после парсинга, optind  
+    if (argv[optind]) { //существует ли этот аргумент строки после парсинга, optind указывает на первый аргумент 
+    //который не был обработан как флаг. т.е будет работать даже если флаг был в конце командной строки 
+    //в случае отсутствия флагов optind = 1
         fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));//+1 для хранения /0, чтобы функции не читали строку вне ее массива
-        strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
-        fl.counter_patterns++;
-    }
-    // печатает все паттерны из fl.patterns 
+        //выделение памяти под шаблон с текущей длиной аргумента 
+        //fl.counter_patterns = 0 изначально, мы занулили в начале структуру 
+        //fl.patterns[fl.counter_patterns] - это конкретный указатель на строку шаблона
+        strcpy(fl.patterns[fl.counter_patterns], argv[optind]); //копируем текущий аргумент в текущий шаблон 
+        fl.counter_patterns++;//переходим на след массив-строку шаблона 
+         // печатает все паттерны из fl.patterns 
     for (int i = 0; i < fl.counter_patterns; i++)
         printf("%d. %s\n", i, fl.patterns[i]);
 
@@ -42,10 +58,6 @@ int main(int argc, char *argv[]) {//
         printf("input file %d: %s\n", i, input_files[i]);
     }
 
-    
-
-
-  
 
     //printf("str16\n");
     if (pattern == NULL) {
@@ -53,7 +65,6 @@ int main(int argc, char *argv[]) {//
     //exit(EXIT_FAILURE);
 }
     
-  
    
 
     for(int i = optind; i < argc; i++){ //optind это переменная из getopt, указывает на следующий аргумент после флагов 
@@ -67,10 +78,10 @@ int main(int argc, char *argv[]) {//
     return 0;
 
 }
+}
 
  void parser(flags *fl, int argc, char *argv[]){
         int opt = 0;
-      
         while(opt!= -1){
             opt = getopt(argc, argv, "e:f:ivclnhso"); // : требует аргумента 
             switch(opt){
@@ -146,52 +157,37 @@ void add_template(flags *fl, char *template_file) {
 void process_file(char *filename, char *pattern, flags *fl){
   
     FILE *file = fopen(filename, "r");
-
     char *line = NULL;
     size_t length = 0; 
     int match_count = 0; // for flag c
     int match_count_cv = 0;
-
+    regex_t regex; 
     if(file != NULL){
-  
-        regex_t regex; 
-        compile_reg(&regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
-   
         
-    
-
+        compile_reg(&regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
         while( (getline(&line, &length, file)) != -1){ //читаем построчно
-         
             change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
-     
- 
             int status = regexec(&regex, line, 0, NULL, 0); //ноль если было совпадение 
-          
                 if(!status){
                     match_count++;
                 } else {
                     match_count_cv++;
                 }
-
-
-
                 if(!status && !fl->c && !fl->v){
                     printf("%s\n", line);
                 } else if (status && fl->v && !fl->c){
                     printf("%s\n", line);
                 }
-          
-
         }
         if(fl->c && !fl->v){
-        c_flag(match_count);
+            c_flag(match_count);
         } else if (fl->c && fl->v){
             cv_flag(match_count_cv);
         }
-
+    }
         regfree(&regex);
         fclose(file);
-    } /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке 
+     /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке 
         printf("s21_grep: %s: No such file or directory\n", filename);
     }*/
 }
