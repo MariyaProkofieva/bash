@@ -1,12 +1,12 @@
 #include "s21_grep.h"
 
 void parser(flags *fl, int argc, char *argv[]); 
-void process_file(char *filename, char *pattern, flags *fl);
-void compile_reg(regex_t *regex, char *pattern, flags *fl);
+void process_file(char *filename, char **pattern, flags fl);
+void compile_reg(regex_t *regex, char **pattern, flags fl);
 void change_linebreak(char *line);
 void c_flag(int match_count);
 void cv_flag(int match_count_cv);
-void add_template(flags *fl, char *template_file);
+void add_template_file(flags *fl, char *template_file);
 
 //ЧТО ИСПРАВИТЬ? НАДО, ЧТОБЫ ПОСЛЕ ФЛАГА СРАЗУ ЖЕ ОБРАБАТЫВАЛСЯ СЛЕД АРГУМЕНТ ЗА ФЛАГОМ, ПОСМОТРЕТЬ С ПОМОЩЬЮ КАКОЙ ПЕРЕМЕННОЙ А НЕ ОПТИНД, ЧТОБЫ ЭТОТ АРГУМЕНТ 
 //ДОБАВЛЯЛСЯ В МАССИВ ПАТЕРНОВ, А АРГУМЕНТ КОТОРЫЙ НЕ ФЛАГ И НЕ ШАБЛОН БУДЕТ ЯВЛЯТЬСЯ ФАЙЛОМ 
@@ -30,57 +30,75 @@ void add_template(flags *fl, char *template_file);
 //в случае поиска в двух файлах греп выводит имя каждого файла и строки совпадений в этих файлах
 
 
+
+//try to do some usual combinations: 
+// grep pattern file
+// grep -option pattern file 
+// grep pattern file file2
+// grep -option pattern file file2
+// grep -opt -opt -opt pattern file
+
+
+// grep -e pattern -f pattern.txt file.txt
+// grep -i pattern file.txt -e pattern2 file2.txt
+
+// т.е последним аргументом всегда является файл
+// после флага только флаг или паттерн 
+// если после флага был паттерн и не было флага далее только файлы
+// только не с флагами е и f
+
 int main(int argc, char *argv[]) {//
-    char *input_files[argc]; //массив с указателями на отдельные строки имен файлов. каждый указатель ссылается на строку конкретного файла 
-    // ??? почему аргс если файлов может быть меньше аргс или это типа макс допустимый
-    char *pattern = "to del"; //шаблон 
-    flags fl = {0}; //зануляем инты
+    char *input_files[argc];  
+    char *pattern = "to del"; 
+    flags fl = {0}; 
     
-    fl.input_files = input_files;//чтобы обращаться к структуре с **input_files, мы приравниваем структуру **input_files к *input_files 
-    //т.е мы говорим на что ссылается **. указатели ** cсылаются на массив указателей *[ ], которые ссылаются на первые элементы строк 
-    
-    parser(&fl, argc, argv); //парсим
-    // printf("optind=%d %s\n", optind, argv[optind]);
-    if (argv[optind]) { //существует ли этот аргумент строки после парсинга, optind указывает на первый аргумент 
-    //который не был обработан как флаг. т.е будет работать даже если флаг был в конце командной строки 
-    //в случае отсутствия флагов optind = 1
-        fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));//+1 для хранения /0, чтобы функции не читали строку вне ее массива
-        //выделение памяти под шаблон с текущей длиной аргумента 
-        //fl.counter_patterns = 0 изначально, мы занулили в начале структуру 
-        //fl.patterns[fl.counter_patterns] - это конкретный указатель на строку шаблона
-        strcpy(fl.patterns[fl.counter_patterns], argv[optind]); //копируем текущий аргумент в текущий шаблон 
-        fl.counter_patterns++;//переходим на след массив-строку шаблона 
-        
-    for (int i = 0; i < fl.counter_patterns; i++)  // печатает все паттерны из fl.patterns в том числе и файл
-        printf("fl.patterns: %d. %s\n", i, fl.patterns[i]);
-
-    // записывает все аргументы правее паттерна в список входных файлов (может и не быть их)
-    optind++; //переходим на новый аргумент 
-    for (int i = 0; i < argc; i++) {
-        input_files[i] = NULL;
-    }
-
-    for (int i = 0; optind < argc; i++, optind++) {
-        input_files[i] = malloc((strlen(argv[optind])+1) * sizeof(char));//выделение памяти
-        strcpy(input_files[i], argv[optind]);
-        printf("input file %d: %s\n", i, input_files[i]);
-    }
-    for (int i = 0; input_files[i]; i++) {
-        printf("input file %d: %s\n", i, input_files[i]);
-    }
-
-
-    //printf("str16\n");
-    if (pattern == NULL) {
-    //perror("Ошибка выделения памяти");
-    //exit(EXIT_FAILURE);
-}
-    
+    fl.input_files = input_files;
    
+    
+    parser(&fl, argc, argv); 
+
+    //кейс: когда нет флагов и может быть несколько файлов, когда несколько флагов подряд но не ф и е
+
+    //я не понимаю что делать с ситуаций grep -opt patt -opt patt file --  считать как греп все после патерна файлом но не флаг и делать флаг
+        if(!(fl.e||fl.f)){
+            if(argc>2) {
+                fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));
+                strcpy(fl.patterns[fl.counter_patterns], argv[optind]); 
+                fl.counter_patterns++;
+
+                
+
+                    for (int i = 0; i < fl.counter_patterns; i++)  
+                        printf("fl.patterns: %d. %s\n", i, fl.patterns[i]);
+                        //optind++; 
+
+            } else {
+
+                //мало аргументов
+                //exit 
+
+            }
+        }
+
+            for (int i = 0; i < argc; i++) {
+                input_files[i] = NULL;
+            }
+
+            for (int i = optind+1, n = 0; i < argc; i++, n++) {
+                input_files[n] = malloc((strlen(argv[i])+1) * sizeof(char));
+                strcpy(input_files[n], argv[i]);
+               printf("input file %d: %s\n", n, input_files[n]);
+            }
+            //printf("input file %d: %s\n", i, input_files[i]);
+   
+    
+
+        
+
 
     for(int i = optind; i < argc; i++){ //optind это переменная из getopt, указывает на следующий аргумент после флагов 
     
-        process_file(argv[i], pattern, &fl); 
+        process_file(argv[i], fl.patterns, fl); 
 
     }
     
@@ -88,13 +106,53 @@ int main(int argc, char *argv[]) {//
     
     return 0;
 
-}
-}
+
+
+
+    }
+
+
+    /*if (argv[optind]) { 
+        fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));
+        strcpy(fl.patterns[fl.counter_patterns], argv[optind]); 
+        fl.counter_patterns++;
+
+    for (int i = 0; i < fl.counter_patterns; i++)  
+        printf("fl.patterns: %d. %s\n", i, fl.patterns[i]);
+        optind++; 
+        */
+
+    /*for (int i = 0; i < argc; i++) {
+        input_files[i] = NULL;
+    } */
+
+    /*for (int i = 0; optind < argc; i++, optind++) {
+        input_files[i] = malloc((strlen(argv[optind])+1) * sizeof(char));
+        strcpy(input_files[i], argv[optind]);
+        printf("input file %d: %s\n", i, input_files[i]);
+    }*/
+   /* for (int i = 0; input_files[i]; i++) {
+        printf("input file %d: %s\n", i, input_files[i]);
+    } */
+
+
+    //printf("str16\n");
+   // if (pattern == NULL) {
+    //perror("Ошибка выделения памяти");
+    //exit(EXIT_FAILURE);
+//}
+    
+   
+
+
+
 
  void parser(flags *fl, int argc, char *argv[]){
         int opt = 0;
+        int loginindex = 0;
         while(opt!= -1){
-            opt = getopt(argc, argv, "e:f:ivclnhso"); // : требует аргумента 
+            opt = getopt_long(argc, argv, "e:f:ivclnhso", NULL, &loginindex); // : требует аргумента 
+            printf("opt = %c\n", opt);
             switch(opt){
                 
                 case 'e':
@@ -131,7 +189,7 @@ int main(int argc, char *argv[]) {//
                 break;
                 case 'f':
                     fl->f = 1;
-                    add_template(fl, optarg);
+                    add_template_file(fl, optarg);
                 break;
                 case 'o':
                     fl->o = 1;
@@ -143,7 +201,7 @@ int main(int argc, char *argv[]) {//
     }
 
 
-void add_template(flags *fl, char *template_file) {
+void add_template_file(flags *fl, char *template_file) {
     FILE *file = fopen(template_file, "r");
     char *line = NULL;
     size_t length = 0; 
@@ -165,38 +223,42 @@ void add_template(flags *fl, char *template_file) {
     fclose(file);
 }
 
-void process_file(char *filename, char *pattern, flags *fl){
+void process_file(char *filename, char **pattern, flags fl){
   
     FILE *file = fopen(filename, "r");
     char *line = NULL;
     size_t length = 0; 
     int match_count = 0; // for flag c
     int match_count_cv = 0;
-    regex_t regex; 
+    regex_t regex[10000]; 
     if(file != NULL){
+
+        // сделать регкомп одновременно для всех патернов 
+        //
         
-        compile_reg(&regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
+        compile_reg(regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
         while( (getline(&line, &length, file)) != -1){ //читаем построчно
             change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
-            int status = regexec(&regex, line, 0, NULL, 0); //ноль если было совпадение 
+            int status = regexec(regex, line, 0, NULL, 0); //ноль если было совпадение 
                 if(!status){
                     match_count++;
                 } else {
                     match_count_cv++;
                 }
-                if(!status && !fl->c && !fl->v){
+                if(!status && !fl.c && !fl.v){
                     printf("%s\n", line);
-                } else if (status && fl->v && !fl->c){
+                } else if (status && fl.v && !fl.c){
                     printf("%s\n", line);
                 }
         }
-        if(fl->c && !fl->v){
+        if(fl.c && !fl.v){
             c_flag(match_count);
-        } else if (fl->c && fl->v){
+        } else if (fl.c && fl.v){
             cv_flag(match_count_cv);
         }
     }
-        regfree(&regex);
+        //regfree(regex);
+        free(line);
         fclose(file);
      /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке 
         printf("s21_grep: %s: No such file or directory\n", filename);
@@ -205,12 +267,16 @@ void process_file(char *filename, char *pattern, flags *fl){
 
 
 
-void compile_reg(regex_t *regex, char *pattern, flags *fl){
-    if(regcomp(regex, pattern, fl->i ? REG_ICASE : REG_EXTENDED)){//если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
-        printf("PIZDA");
-        exit(1);
+void compile_reg(regex_t *regex, char **pattern, flags fl){
+    for(int i = 0; i<fl.counter_patterns; i++){
+         
+        
+        if(regcomp(regex, pattern[i], fl.i ? REG_ICASE : REG_EXTENDED)){//если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
+            printf("PIZDA");
+            exit(1);
+        }
+        
     }
-
     //добавить про флаг i и про ошибку компиляции в случае не 0
     //reg extended
     //printf("116 str\n");
