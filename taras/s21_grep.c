@@ -84,10 +84,11 @@ int main(int argc, char *argv[]) {//
                 input_files[i] = NULL;
             }
 
-            for (int i = optind+1, n = 0; i < argc; i++, n++) {
+            for (int i = optind, n = 0; i < argc; i++, n++) {
                 input_files[n] = malloc((strlen(argv[i])+1) * sizeof(char));
                 strcpy(input_files[n], argv[i]);
-               printf("input file %d: %s\n", n, input_files[n]);
+                fl.counter_files++;
+                printf("input file %d: %s\n", fl.counter_files, input_files[n]);
             }
             //printf("input file %d: %s\n", i, input_files[i]);
    
@@ -231,32 +232,36 @@ void process_file(char *filename, char **pattern, flags fl){
     int match_count = 0; // for flag c
     int match_count_cv = 0;
     regex_t regex[10000]; 
-    if(file != NULL){
-
-        // сделать регкомп одновременно для всех патернов 
-        //
-        
-        compile_reg(regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
-        while( (getline(&line, &length, file)) != -1){ //читаем построчно
-            change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
-            int status = regexec(regex, line, 0, NULL, 0); //ноль если было совпадение 
-                if(!status){
-                    match_count++;
-                } else {
-                    match_count_cv++;
-                }
-                if(!status && !fl.c && !fl.v){
-                    printf("%s\n", line);
-                } else if (status && fl.v && !fl.c){
-                    printf("%s\n", line);
-                }
+    if(file == NULL){
+        printf("error");
+        exit(1);
+    }
+    compile_reg(regex, pattern, fl); //здесь компилируется шаблон поиска для регексес
+    while( (getline(&line, &length, file)) != -1){ //читаем построчно
+        change_linebreak(line); //заменяем ньюлайн на конец строки чтобы рег дальше работал
+        int status = 1; //ноль если было совпадение 
+        for (int i = 0; i<fl.counter_patterns; i++) {
+            if(!regexec(&regex[i], line, 0, NULL, 0)) {
+                status = 0;
+            }
         }
-        if(fl.c && !fl.v){
-            c_flag(match_count);
-        } else if (fl.c && fl.v){
-            cv_flag(match_count_cv);
+        if(!status){
+            match_count++;
+        } else {
+            match_count_cv++;
+        }
+        if(!status && !fl.c && !fl.v){
+            printf("%s\n", line);
+        } else if (status && fl.v && !fl.c){
+            printf("%s\n", line);
         }
     }
+    if(fl.c && !fl.v){
+        c_flag(match_count);
+    } else if (fl.c && fl.v){
+        cv_flag(match_count_cv);
+    }
+    
         //regfree(regex);
         free(line);
         fclose(file);
@@ -269,9 +274,7 @@ void process_file(char *filename, char **pattern, flags fl){
 
 void compile_reg(regex_t *regex, char **pattern, flags fl){
     for(int i = 0; i<fl.counter_patterns; i++){
-         
-        
-        if(regcomp(regex, pattern[i], fl.i ? REG_ICASE : REG_EXTENDED)){//если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
+        if(regcomp(&regex[i], pattern[i], fl.i ? REG_ICASE : REG_EXTENDED)){//если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
             printf("PIZDA");
             exit(1);
         }
@@ -302,30 +305,6 @@ void e_flag(){
 void cv_flag(int match_count_cv){
     printf("%d", match_count_cv);
 }
-
-// void f_flag(char *pattern, char *optarg) {//это для файла флага f, optarg - имя файла f
-//     FILE *file = fopen(optarg, "r"); //открытие файла для шаблонов. optarg хранит аргумент флага
-//     if(file){
-
-//         char *line = NULL;
-//         size_t length = 0; 
-//         char *pattern_str;
-
-//          while( (getline(&line, &length, file)) != -1){
-//          pattern_str = malloc(strlen(line) + 1);
-//          strcpy(pattern_str, line);
-//          replace_linebreak(&copy_line);
-
-
-
-//         }
-
-//     } else {
-//         printf("s21_grep: %s: No such file or directory\n", optarg);
-//     }
-// }
-
-
 
 
 
