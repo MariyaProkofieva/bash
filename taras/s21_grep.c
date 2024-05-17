@@ -1,7 +1,7 @@
 #include "s21_grep.h"
 
 void parser(flags *fl, int argc, char *argv[]);
-void process_file(char *filename, char **pattern, flags fl);
+void process_file(char *filename, char **pattern, flags fl, char *input_files);
 void compile_reg(regex_t *regex, char **pattern, flags fl);
 void change_linebreak(char *line);
 void c_flag(int match_count);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     for (int i = optind; i < argc; i++)
     { // optind это переменная из getopt, указывает на следующий аргумент после флагов
 
-        process_file(argv[i], fl.patterns, fl);
+        process_file(argv[i], fl.patterns, fl, *input_files);
     }
 
     return 0;
@@ -208,7 +208,7 @@ void add_template_file(flags *fl, char *template_file)
     fclose(file);
 }
 
-void process_file(char *filename, char **pattern, flags fl)
+void process_file(char *filename, char **pattern, flags fl, char *input_files)
 {
 
     FILE *file = fopen(filename, "r");
@@ -223,51 +223,69 @@ void process_file(char *filename, char **pattern, flags fl)
         //exit(1);
         return ;
     }
-    compile_reg(regex, pattern, fl); // здесь компилируется шаблон поиска для регексес
+    compile_reg(regex, pattern, fl); 
     while ((getline(&line, &length, file)) != -1)
-    {                           // читаем построчно
-        change_linebreak(line); // заменяем ньюлайн на конец строки чтобы рег дальше работал
-        int status = 1;         // ноль если было совпадение
+    {                           
+        change_linebreak(line); 
+        int status = 1;         
         for (int i = 0; i < fl.counter_patterns; i++)
         {
+            //printf("s233\n");
             if (!regexec(&regex[i], line, 0, NULL, 0))
             {
-                status = 0;
+                    status = 0;
+               
+                match_count++;
+            
+            if(fl.counter_files>1){
+                printf("%s:", filename);
+            }
+
+            if (!fl.c && !fl.v)
+            {
+                printf("%s\n", line);
+            }
+            
+           
+            break;
+
+            } else {
+                match_count_cv++;
+                if(fl.v && !fl.c)
+                {
+                    printf("%s\n", line);
+                }
             }
         }
-        if (!status)
-        {
-            match_count++;
-        }
-        else
-        {
-            match_count_cv++;
-        }
-        if (!status && !fl.c && !fl.v)
-        {
-            printf("%s\n", line);
-        }
-        else if (status && fl.v && !fl.c)
-        {
-            printf("%s\n", line);
-        }
     }
+     
+        
     if (fl.c && !fl.v)
-    {
-        c_flag(match_count);
+    {  if(fl.counter_files>1){
+                printf("%s:", filename);
+            } 
+       printf("%d", match_count);
+     
     }
+
     else if (fl.c && fl.v)
-    {
+    {   
+       if(fl.counter_files>1){
+                printf("%s:", filename);
+            }
         cv_flag(match_count_cv);
     }
 
+   
     // regfree(regex);
     free(line);
     fclose(file);
     /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке
        printf("s21_grep: %s: No such file or directory\n", filename);
    }*/
+
 }
+   
 
 void compile_reg(regex_t *regex, char **pattern, flags fl)
 {
