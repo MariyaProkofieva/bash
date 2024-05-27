@@ -33,8 +33,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            // мало аргументов
-            // exit
+            exit(1);
         }
     }
 
@@ -71,6 +70,7 @@ int main(int argc, char *argv[])
 void parser(flags *fl, int argc, char *argv[])
 {
     int opt = 0;
+    opterr = 0;
     int loginindex = 0;
     while (opt != -1)
     {
@@ -83,8 +83,7 @@ void parser(flags *fl, int argc, char *argv[])
             fl->patterns[fl->counter_patterns] = malloc((strlen(optarg) + 1) * sizeof(char)); 
             if (fl->patterns[fl->counter_patterns] == NULL)
             {
-                // perror("Ошибка выделения памяти");
-                // exit(EXIT_FAILURE);
+                exit(1);
             }
             strcpy(fl->patterns[fl->counter_patterns], optarg);
             fl->counter_patterns++;
@@ -118,7 +117,12 @@ void parser(flags *fl, int argc, char *argv[])
             fl->o = 1;
             break;
         case '?':
-            printf("TODO copypast from grep error\n");
+            if(!fl->s){
+                printf("s21_grep: invalid option -- %c\n", optopt);
+                printf("usage: s21_grep [-chilnsvo]\n");
+                printf("[-e pattern] [-f file]\n");
+            }
+            exit (1);
         }
     }
 }
@@ -131,8 +135,9 @@ void add_template_file(flags *fl, char *template_file)
 
     if (!file)
     {
-        printf("ERROR file not\n");
-        // grep: template1.txt: No such file or directory
+        if(!fl->s){
+        printf("s21_grep: %s: No such file or directory\n", template_file);
+        }
         return;
     }
     while ((getline(&line, &length, file)) != EOF)
@@ -163,7 +168,9 @@ void process_file(char *filename, char **pattern, flags fl)
     int flag_match = 0;
     if (file == NULL)
     {
-        printf("error98989");
+        if(!fl.s){
+        printf("s21_grep: %s: No such file or directory\n", filename);
+        }
         return;
     }
     compile_reg(regex, pattern, fl);
@@ -200,9 +207,7 @@ void process_file(char *filename, char **pattern, flags fl)
     }
     free(line);
     fclose(file);
-    /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке
-       printf("s21_grep: %s: No such file or directory\n", filename);
-   }*/
+    
 }
 
 void compile_reg(regex_t *regex, char **pattern, flags fl)
@@ -210,20 +215,17 @@ void compile_reg(regex_t *regex, char **pattern, flags fl)
     for (int i = 0; i < fl.counter_patterns; i++)
     {
         if (regcomp(&regex[i], pattern[i], fl.i ? REG_ICASE : REG_EXTENDED))
-        { // если флаг i то выключаем учет регистра иначе расширенное регулярное выражение
-            printf("PIZDA");
+        { 
             exit(1);
         }
     }
-    // добавить про флаг i и про ошибку компиляции в случае не 0
-    // reg extended
-    // printf("116 str\n");
+
 }
 
 void change_linebreak(char *line)
 {
 
-    int end_str = (int)strlen(line) - 1; // индекс
+    int end_str = (int)strlen(line) - 1;
     if (line[end_str] == '\n')
     {
         line[end_str] = '\0';
@@ -302,19 +304,8 @@ void add_newline_pattern(flags *fl, char *line, size_t length){
     fl->patterns[fl->counter_patterns] = malloc((length+1) * sizeof(char));
     strcpy(fl->patterns[fl->counter_patterns], line);
     fl->counter_patterns++;
-
-
 }
 
 
 
 
-
-
-// относительно работаю флаги:
-//  i
-//  c
-//  c + i
-//  v
-//  v + c +i
-//  начат s
