@@ -1,59 +1,27 @@
 #include "s21_grep.h"
 
 void parser(flags *fl, int argc, char *argv[]);
-void process_file(char *filename, char **pattern, flags fl, char *input_files);
+void process_file(char *filename, char **pattern, flags fl);
 void compile_reg(regex_t *regex, char **pattern, flags fl);
 void change_linebreak(char *line);
-void c_flag(int match_count);
-void cv_flag(int match_count_cv);
 void add_template_file(flags *fl, char *template_file);
+int is_match(flags *fl, char *line, char *filename, regex_t *regex, int number_line);
+void process_flag_c(flags *fl, int match_count, int dismatch_count, char *filename);
+void process_line(flags *fl, char *filename, char *line, int match, int number_line);
+void print_filename(flags *fl, char *filename);
+void print_number(flags *fl, int number_line);
+void add_newline_pattern(flags *fl, char *line, size_t length);
 
-// ЧТО ИСПРАВИТЬ? НАДО, ЧТОБЫ ПОСЛЕ ФЛАГА СРАЗУ ЖЕ ОБРАБАТЫВАЛСЯ СЛЕД АРГУМЕНТ ЗА ФЛАГОМ, ПОСМОТРЕТЬ С ПОМОЩЬЮ КАКОЙ ПЕРЕМЕННОЙ А НЕ ОПТИНД, ЧТОБЫ ЭТОТ АРГУМЕНТ
-// ДОБАВЛЯЛСЯ В МАССИВ ПАТЕРНОВ, А АРГУМЕНТ КОТОРЫЙ НЕ ФЛАГ И НЕ ШАБЛОН БУДЕТ ЯВЛЯТЬСЯ ФАЙЛОМ
-
-// ХОТЯ В ПАРСИНГЕ В ОПТАРГ ДОБАВЛЯЮТСЯ ШАБЛОНЫ И ФАЙЛЫ
-
-// не получается сделать поиск строки с пробелами непосредственно самим оригинальным grep -- а нужно ли делать экранирование с флагом е? -- мой код ловит все шаблоны а греп нет
-
-// оригинальный греп ожидает после флага обязательно указания файла, нельзя написать: флаг-шаблон флаг-шаблон файл
-
-// можно: -флаг шаблон файл -флаг шаблон
-// можно: файл -флаг шаблон
-// можно: файл -флаг шаблон -флаг шаблон
-// можно: -флаг шаблон файл -флаг шаблон файл2
-// можно: файл -флаг шаблон файл -флаг шаблон -- оба шаблона будут искаться в обоих файлах
-
-// необычный вывод оригинального грепа в случае одного файла известного и одного неизвестного (пример в тг)
-// в случае поиска в двух файлах греп выводит имя каждого файла и строки совпадений в этих файлах
-
-// try to do some usual combinations:
-//  grep pattern file
-//  grep -option pattern file
-//  grep pattern file file2
-//  grep -option pattern file file2
-//  grep -opt -opt -opt pattern file
-
-// grep -e pattern -f pattern.txt file.txt
-// grep -i pattern file.txt -e pattern2 file2.txt
-
-// т.е последним аргументом всегда является файл
-// после флага только флаг или паттерн
-// если после флага был паттерн и не было флага далее только файлы
-// только не с флагами е и f
 
 int main(int argc, char *argv[])
-{ //
+{ 
     char *input_files[argc];
-    char *pattern = "to del";
     flags fl = {0};
 
     fl.input_files = input_files;
 
     parser(&fl, argc, argv);
 
-    // кейс: когда нет флагов и может быть несколько файлов, когда несколько флагов подряд но не ф и е
-
-    // я не понимаю что делать с ситуаций grep -opt patt -opt patt file --  считать как греп все после патерна файлом но не флаг и делать флаг
     if (!(fl.e || fl.f))
     {
         if (argc > 2)
@@ -62,13 +30,9 @@ int main(int argc, char *argv[])
             strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
             fl.counter_patterns++;
             optind++;
-
-            for (int i = 0; i < fl.counter_patterns; i++)
-                printf("fl.patterns: %d. %s\n", i, fl.patterns[i]);
         }
         else
         {
-
             // мало аргументов
             // exit
         }
@@ -84,47 +48,25 @@ int main(int argc, char *argv[])
         input_files[n] = malloc((strlen(argv[i]) + 1) * sizeof(char));
         strcpy(input_files[n], argv[i]);
         fl.counter_files++;
-        printf("input file %d: %s\n", fl.counter_files, input_files[n]);
     }
-    // printf("input file %d: %s\n", i, input_files[i]);
+    
 
     for (int i = optind; i < argc; i++)
-    { // optind это переменная из getopt, указывает на следующий аргумент после флагов
+    { 
 
-        process_file(argv[i], fl.patterns, fl, *input_files);
+        process_file(argv[i], fl.patterns, fl);
     }
 
+    for(int i = 0; i<fl.counter_patterns; i++){
+        free(fl.patterns[i]);
+    }
+
+    for(int i = 0; i<fl.counter_files; i++){
+        free(fl.input_files[i]);
+    }
     return 0;
 }
 
-/*if (argv[optind]) {
-    fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind])+1) * sizeof(char));
-    strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
-    fl.counter_patterns++;
-
-for (int i = 0; i < fl.counter_patterns; i++)
-    printf("fl.patterns: %d. %s\n", i, fl.patterns[i]);
-    optind++;
-    */
-
-/*for (int i = 0; i < argc; i++) {
-    input_files[i] = NULL;
-} */
-
-/*for (int i = 0; optind < argc; i++, optind++) {
-    input_files[i] = malloc((strlen(argv[optind])+1) * sizeof(char));
-    strcpy(input_files[i], argv[optind]);
-    printf("input file %d: %s\n", i, input_files[i]);
-}*/
-/* for (int i = 0; input_files[i]; i++) {
-     printf("input file %d: %s\n", i, input_files[i]);
- } */
-
-// printf("str16\n");
-// if (pattern == NULL) {
-// perror("Ошибка выделения памяти");
-// exit(EXIT_FAILURE);
-//}
 
 void parser(flags *fl, int argc, char *argv[])
 {
@@ -132,15 +74,13 @@ void parser(flags *fl, int argc, char *argv[])
     int loginindex = 0;
     while (opt != -1)
     {
-        opt = getopt_long(argc, argv, "e:f:ivclnhso", NULL, &loginindex); // : требует аргумента
-        printf("opt = %c\n", opt);
+        opt = getopt_long(argc, argv, "e:f:ivclnhso", NULL, &loginindex); 
         switch (opt)
         {
 
         case 'e':
-            printf("opt=%d optind=%d optarg=%s\n", opt, optind, optarg);
             fl->e = 1;
-            fl->patterns[fl->counter_patterns] = malloc((strlen(optarg) + 1) * sizeof(char)); //+1 для хранения /0, чтобы функции не читали строку вне ее массива
+            fl->patterns[fl->counter_patterns] = malloc((strlen(optarg) + 1) * sizeof(char)); 
             if (fl->patterns[fl->counter_patterns] == NULL)
             {
                 // perror("Ошибка выделения памяти");
@@ -192,100 +132,78 @@ void add_template_file(flags *fl, char *template_file)
     if (!file)
     {
         printf("ERROR file not\n");
-       // exit(1);
-        // TODO
         // grep: template1.txt: No such file or directory
-        // exit from progranm
+        return;
     }
     while ((getline(&line, &length, file)) != EOF)
-    {
-        printf("file line %s\n", line);
+    {   
+        if(*line == '\n'){
+            add_newline_pattern(fl, line, length);
+            continue;
+        }
         fl->patterns[fl->counter_patterns] = malloc((length + 1) * sizeof(char));
         change_linebreak(line);
         strcpy(fl->patterns[fl->counter_patterns], line);
         fl->counter_patterns++;
     }
+    free(line);
     fclose(file);
 }
 
-void process_file(char *filename, char **pattern, flags fl, char *input_files)
+void process_file(char *filename, char **pattern, flags fl)
 {
 
     FILE *file = fopen(filename, "r");
     char *line = NULL;
     size_t length = 0;
-    int match_count = 0; // for flag c
-    int match_count_cv = 0;
+    int match_count = 0; 
+    int dismatch_count = 0;
     regex_t regex[10000];
+    int number_line = 0;
+    int flag_match = 0;
     if (file == NULL)
     {
         printf("error98989");
-        //exit(1);
-        return ;
+        return;
     }
-    compile_reg(regex, pattern, fl); 
+    compile_reg(regex, pattern, fl);
+    
+
     while ((getline(&line, &length, file)) != -1)
-    {                           
-        change_linebreak(line); 
-        int status = 1;         
-        for (int i = 0; i < fl.counter_patterns; i++)
-        {
-            //printf("s233\n");
-            if (!regexec(&regex[i], line, 0, NULL, 0))
-            {
-                    status = 0;
-               
-                match_count++;
-            
-            if(fl.counter_files>1){
-                printf("%s:", filename);
-            }
-
-            if (!fl.c && !fl.v)
-            {
-                printf("%s\n", line);
-            }
-            
-           
-            break;
-
-            } else {
-                match_count_cv++;
-                if(fl.v && !fl.c)
-                {
-                    printf("%s\n", line);
-                }
-            }
+    {   
+        number_line++;
+        int match = is_match(&fl, line, filename, regex, number_line);
+        change_linebreak(line);
+        if(match){
+            flag_match = 1;
+            match_count++;
+        } else {
+            dismatch_count++;
+        }
+        if(!fl.c && !fl.o && !fl.l){
+            process_line(&fl, filename, line, match, number_line);
         }
     }
-     
-        
-    if (fl.c && !fl.v)
-    {  if(fl.counter_files>1){
-                printf("%s:", filename);
-            } 
-       printf("%d", match_count);
-     
+
+    
+    
+    if(fl.c){
+        process_flag_c(&fl, match_count, dismatch_count, filename);
     }
 
-    else if (fl.c && fl.v)
-    {   
-       if(fl.counter_files>1){
-                printf("%s:", filename);
-            }
-        cv_flag(match_count_cv);
+    if(fl.l && flag_match){
+        printf("%s\n", filename);
     }
-
-   
-    // regfree(regex);
+    
+    for (int i = 0; i < fl.counter_patterns; i++){
+    regfree(&regex[i]);
+    }
     free(line);
     fclose(file);
     /*else if (!fl->s){ /// этот флаг для подавления сообщения об ошибке
        printf("s21_grep: %s: No such file or directory\n", filename);
    }*/
-
 }
-   
 
 void compile_reg(regex_t *regex, char **pattern, flags fl)
 {
@@ -312,19 +230,86 @@ void change_linebreak(char *line)
     }
 }
 
-void c_flag(int match_count)
+
+
+int is_match(flags *fl, char *line, char *filename, regex_t *regex, int number_line)
 {
-    printf("%d", match_count);
+    int match = 0;
+    regmatch_t regmatch; 
+    for (int i = 0; i < fl->counter_patterns; i++)
+    {
+        if (!regexec(&regex[i], line, 1, &regmatch, 0))
+        {
+            match = 1;
+            if (fl->o && !fl->c && !fl->v && !fl->l)
+            {   
+                char *cutted_line = line + regmatch.rm_eo;
+                print_filename(fl, filename);
+                print_number(fl, number_line);
+                printf("%s\n", fl->patterns[i]);
+                while (!regexec(&regex[i], cutted_line, 1, &regmatch, 0)) {
+                    cutted_line += regmatch.rm_eo;
+                    print_filename(fl, filename);
+                    print_number(fl, number_line);
+                    printf("%s\n", fl->patterns[i]);
+                }               
+            }
+        }
+       
+    }
+    return match;
 }
 
-void e_flag()
+void print_filename(flags *fl, char *filename)
 {
+    if (fl->counter_files > 1 && !fl->h)
+    {
+        printf("%s:", filename);
+    }
 }
 
-void cv_flag(int match_count_cv)
-{
-    printf("%d", match_count_cv);
+void process_line(flags *fl, char *filename, char *line, int match, int number_line){
+    if(!fl->v && match){
+        print_filename(fl, filename);
+        print_number(fl, number_line);
+        printf("%s\n", line);
+    } else if (fl->v && !match){
+        print_filename(fl, filename);
+        print_number(fl, number_line);
+        printf("%s\n", line);
+    }
 }
+
+void process_flag_c(flags *fl, int match_count, int dismatch_count, char *filename){
+    print_filename(fl, filename);
+    if(!fl->v){
+        printf("%d\n", match_count);
+    } else {
+        printf("%d\n", dismatch_count);
+    }
+
+}
+
+
+void print_number(flags *fl, int number_line){
+    if(fl->n && !fl->c){
+    printf("%d:", number_line);
+    }
+}
+
+void add_newline_pattern(flags *fl, char *line, size_t length){
+
+    fl->patterns[fl->counter_patterns] = malloc((length+1) * sizeof(char));
+    strcpy(fl->patterns[fl->counter_patterns], line);
+    fl->counter_patterns++;
+
+
+}
+
+
+
+
+
 
 // относительно работаю флаги:
 //  i

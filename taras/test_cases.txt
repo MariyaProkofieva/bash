@@ -1,0 +1,207 @@
+command:
+./a.out peach test.txt dest.txt empty.txt
+result:
+test.txt:peach peachh apple 
+test.txt:peach 123
+dest.txt:        peach 
+dest.txt:!peach123
+
+
+command:
+./a.out peach notexist.txt test.txt dest.txt empty.txt
+result:
+s21_grep: notexist.txt: No such file or directory
+test.txt:peach peachh apple 
+test.txt:peach 123
+dest.txt:        peach 
+dest.txt:!peach123
+
+
+command:
+./a.out peach
+result: 
+error
+
+
+command:
+./a.out -c peach test.txt
+result:
+2
+
+
+command:
+./a.out -c peach test.txt dest.txt 
+result:
+test.txt:2
+dest.txt:2
+
+
+command:
+./a.out -c peach test.txt dest.txt empty.txt 
+result:
+test.txt:2
+dest.txt:2
+empty.txt:0
+
+
+command:
+./a.out -v peach test.txt
+result:                    
+ttest test test 
+one two three one onne 
+test
+
+
+command:
+./a.out -v peach test.txt dest.txt 
+result:
+test.txt:ttest test test 
+test.txt:one two three one onne 
+test.txt:test
+dest.txt:apple dest 
+dest.txt:
+dest.txt:
+dest.txt:    pea ch 
+dest.txt:PeachApple
+dest.txt:dest desk desk 
+dest.txt:test ttest
+dest.txt:
+dest.txt:
+
+
+command:
+./a.out -v peach test.txt empty.txt 
+result:
+test.txt:ttest test test 
+test.txt:one two three one onne 
+test.txt:test
+
+
+command:
+./a.out -e peach test.txt
+result:
+peach peachh apple 
+peach 123
+
+
+command: OK
+./a.out -e peach -e test test.txt
+result:
+ttest test test 
+peach peachh apple 
+peach 123
+test
+
+
+command: OK
+./a.out -e peach -e test -e pea  test.txt dest.txt 
+result:
+test.txt:ttest test test 
+test.txt:peach peachh apple 
+test.txt:peach 123
+test.txt:test
+dest.txt:    pea ch 
+dest.txt:        peach 
+dest.txt:test ttest
+dest.txt:!peach123
+
+
+command: OK
+./a.out test.txt -e test  
+result:
+ttest test test 
+test
+
+
+command: OK
+./a.out test.txt -e test -e one
+result:
+ttest test test 
+one two three one onne 
+test
+
+
+command: OK
+./a.out  -e test test.txt  -e one 
+result:
+ttest test test 
+one two three one onne 
+test
+
+
+command: OK
+./a.out -e test test.txt empty.txt 
+result:
+test.txt:ttest test test 
+test.txt:test
+
+
+command: OK
+./a.out -f dest.txt test.txt
+result:
+
+ttest test test 
+one two three one onne 
+peach peachh apple 
+peach 123
+test
+
+
+command: OK
+./a.out -f dest.txt -f aest.txt test.txt 
+result:
+
+ttest test test 
+one two three one onne 
+peach peachh apple 
+peach 123
+test
+
+
+command: OK
+./a.out test.txt -f dest.txt -f aest.txt 
+result:
+
+ttest test test 
+one two three one onne 
+peach peachh apple 
+peach 123
+test
+
+
+command: OK
+./a.out -l test dest.txt test.txt  
+result:
+dest.txt
+test.txt
+
+
+command: OK
+./a.out -l -i Test dest.txt test.txt 
+result:
+dest.txt
+test.txt
+
+
+command: OK
+./a.out -n peach aest.txt        
+result:
+2:peach
+3:peach peach peach
+
+
+command: OK
+/a.out -n test dest.txt test.txt 
+result:
+dest.txt:8:test ttest
+test.txt:1:ttest test test 
+test.txt:5:test
+
+
+command: OK
+./a.out -h peach aest.txt test.txt 
+result: 
+peach
+peach peach peach
+peach peachh apple 
+peach 123

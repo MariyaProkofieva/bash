@@ -1,0 +1,18 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     s21_grep
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100002C84, symSize: 0x4A4 }
+  - { offsetInCU: 0x49, offset: 0x49, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100002C84, symSize: 0x4A4 }
+  - { offsetInCU: 0x14E, offset: 0x14E, size: 0x8, addend: 0x0, symName: _parser, symObjAddr: 0x4A4, symBinAddr: 0x100003128, symSize: 0x20C }
+  - { offsetInCU: 0x1AA, offset: 0x1AA, size: 0x8, addend: 0x0, symName: _process_file, symObjAddr: 0x790, symBinAddr: 0x100003414, symSize: 0x328 }
+  - { offsetInCU: 0x2A9, offset: 0x2A9, size: 0x8, addend: 0x0, symName: _add_template_file, symObjAddr: 0xAB8, symBinAddr: 0x10000373C, symSize: 0x13C }
+  - { offsetInCU: 0x305, offset: 0x305, size: 0x8, addend: 0x0, symName: _add_newline_pattern, symObjAddr: 0xBF4, symBinAddr: 0x100003878, symSize: 0x8C }
+  - { offsetInCU: 0x349, offset: 0x349, size: 0x8, addend: 0x0, symName: _change_linebreak, symObjAddr: 0xC80, symBinAddr: 0x100003904, symSize: 0x60 }
+  - { offsetInCU: 0x37B, offset: 0x37B, size: 0x8, addend: 0x0, symName: _compile_reg, symObjAddr: 0xCE0, symBinAddr: 0x100003964, symSize: 0xC8 }
+  - { offsetInCU: 0x3D8, offset: 0x3D8, size: 0x8, addend: 0x0, symName: _is_match, symObjAddr: 0xDA8, symBinAddr: 0x100003A2C, symSize: 0x1E4 }
+  - { offsetInCU: 0x48C, offset: 0x48C, size: 0x8, addend: 0x0, symName: _process_line, symObjAddr: 0xF8C, symBinAddr: 0x100003C10, symSize: 0xF0 }
+  - { offsetInCU: 0x4EE, offset: 0x4EE, size: 0x8, addend: 0x0, symName: _process_flag_c, symObjAddr: 0x107C, symBinAddr: 0x100003D00, symSize: 0x8C }
+  - { offsetInCU: 0x541, offset: 0x541, size: 0x8, addend: 0x0, symName: _print_filename, symObjAddr: 0x1108, symBinAddr: 0x100003D8C, symSize: 0x74 }
+  - { offsetInCU: 0x576, offset: 0x576, size: 0x8, addend: 0x0, symName: _print_number, symObjAddr: 0x117C, symBinAddr: 0x100003E00, symSize: 0x70 }
+...
