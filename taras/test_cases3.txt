@@ -1,0 +1,6 @@
+Test Case 24
+Command:./a.out -h peach aest.txt test.txt
+peach
+peach peach peach
+peach peachh apple 
+peach 123
