@@ -26,15 +26,18 @@ int main(int argc, char *argv[])
     {
         if (argc > 2)
         {
+            
             fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind]) + 1) * sizeof(char));
             strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
             fl.counter_patterns++;
             optind++;
         }
-        else
+        else if (!fl.s)
         {
-            exit(1);
+            printf("Missing arguments\n");
         }
+            exit(1);
+        
     }
 
     for (int i = 0; i < argc; i++)
@@ -117,8 +120,14 @@ void parser(flags *fl, int argc, char *argv[])
             fl->o = 1;
             break;
         case '?':
-            if(!fl->s){
+            if(!fl->s && optopt!='e'){
                 printf("s21_grep: invalid option -- %c\n", optopt);
+                printf("usage: s21_grep [-chilnsvo]\n");
+                printf("[-e pattern] [-f file]\n");
+            }
+
+            if(!fl->s && optopt=='e'){
+                printf("s21_grep: option requires an argument -- e\n");
                 printf("usage: s21_grep [-chilnsvo]\n");
                 printf("[-e pattern] [-f file]\n");
             }
@@ -192,8 +201,6 @@ void process_file(char *filename, char **pattern, flags fl)
         }
     }
 
-    
-    
     if(fl.c){
         process_flag_c(&fl, match_count, dismatch_count, filename);
     }
@@ -284,6 +291,12 @@ void process_line(flags *fl, char *filename, char *line, int match, int number_l
 
 void process_flag_c(flags *fl, int match_count, int dismatch_count, char *filename){
     print_filename(fl, filename);
+    if (fl->l && match_count > 0) 
+    {
+        match_count = 1;
+        printf("%d\n", match_count);
+        return;
+  }
     if(!fl->v){
         printf("%d\n", match_count);
     } else {

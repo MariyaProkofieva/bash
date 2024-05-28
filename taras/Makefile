@@ -1,19 +1,13 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror -std=c11 -g
-TEST_PATH=testing
+CFLAGS=-Wall -Wextra -Werror -std=c11 
 
-all: rebuild
+all: s21_grep
 
 s21_grep:
 	$(CC) $(CFLAGS) s21_grep.c -o s21_grep
-
+	
 test:
-	$(CC) $(CFLAGS) $(TEST_PATH)/s21_grep_test.c $(TEST_PATH)/test_utils.c -o s21_grep_test
-
-run:
-	./s21_grep_test 2 v
-
-rebuild: clean s21_grep test
+	bash grep_test.sh
 
 clean:
-	rm -rf s21_grep test
+	rm -rf s21_grep 
