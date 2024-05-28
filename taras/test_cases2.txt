@@ -1,12 +1,12 @@
 Test Case 1
-Command:./a.out peach test.txt dest.txt empty.txt
+Command:./s21_grep peach test.txt dest.txt empty.txt
 test.txt:peach peachh apple 
 test.txt:peach 123
 dest.txt:        peach 
 dest.txt:!peach123
 end_of_test_case
 Test Case 2
-Command:./a.out peach notexist.txt test.txt dest.txt empty.txt
+Command:./s21_grep peach notexist.txt test.txt dest.txt empty.txt
 s21_grep: notexist.txt: No such file or directory
 test.txt:peach peachh apple 
 test.txt:peach 123
@@ -14,32 +14,32 @@ dest.txt:        peach
 dest.txt:!peach123
 end_of_test_case
 Test Case 3
-Command:./a.out peach
+Command:./s21_grep peach
 Missing arguments
 end_of_test_case
 Test Case 4
-Command:./a.out -c peach test.txt
+Command:./s21_grep -c peach test.txt
 2
 end_of_test_case
 Test Case 5
-Command:./a.out -c peach test.txt dest.txt
+Command:./s21_grep -c peach test.txt dest.txt
 test.txt:2
 dest.txt:2
 end_of_test_case
 Test Case 6:
-Command:./a.out -c peach test.txt dest.txt empty.txt 
+Command:./s21_grep -c peach test.txt dest.txt empty.txt 
 test.txt:2
 dest.txt:2
 empty.txt:0
 end_of_test_case
 Test Case 7:
-Command:./a.out -v peach test.txt                    
+Command:./s21_grep -v peach test.txt                    
 ttest test test 
 one two three one onne 
 test
 end_of_test_case
 Test Case 8:
-Command:./a.out -v peach test.txt dest.txt 
+Command:./s21_grep -v peach test.txt dest.txt 
 test.txt:ttest test test 
 test.txt:one two three one onne 
 test.txt:test
@@ -54,25 +54,25 @@ dest.txt:
 dest.txt:
 end_of_test_case
 Test Case 9:
-Command:./a.out -v peach test.txt empty.txt 
+Command:./s21_grep -v peach test.txt empty.txt 
 test.txt:ttest test test 
 test.txt:one two three one onne 
 test.txt:test
 end_of_test_case
 Test Case 10:
-Command:./a.out -e peach test.txt
+Command:./s21_grep -e peach test.txt
 peach peachh apple 
 peach 123
 end_of_test_case
 Test Case 11: 
-Command:./a.out -e peach -e test test.txt
+Command:./s21_grep -e peach -e test test.txt
 ttest test test 
 peach peachh apple 
 peach 123
 test
 end_of_test_case
 Test Case 12: 
-Command:./a.out -e peach -e test -e pea  test.txt dest.txt 
+Command:./s21_grep -e peach -e test -e pea  test.txt dest.txt 
 test.txt:ttest test test 
 test.txt:peach peachh apple 
 test.txt:peach 123
@@ -83,29 +83,29 @@ dest.txt:test ttest
 dest.txt:!peach123
 end_of_test_case
 Test Case 13: 
-Command:./a.out test.txt -e test  
+Command:./s21_grep test.txt -e test  
 ttest test test 
 test
 end_of_test_case
 Test Case 14: 
-Command:./a.out test.txt -e test -e one
+Command:./s21_grep test.txt -e test -e one
 ttest test test 
 one two three one onne 
 test
 end_of_test_case
 Test Case 15: 
-Command:./a.out  -e test test.txt  -e one 
+Command:./s21_grep  -e test test.txt  -e one 
 ttest test test 
 one two three one onne 
 test
 end_of_test_case
 Test Case 16: 
-Command:./a.out -e test test.txt empty.txt 
+Command:./s21_grep -e test test.txt empty.txt 
 test.txt:ttest test test 
 test.txt:test
 end_of_test_case
 Test Case 17: 
-Command:./a.out -f dest.txt test.txt
+Command:./s21_grep -f dest.txt test.txt
 ttest test test 
 one two three one onne 
 peach peachh apple 
@@ -113,7 +113,7 @@ peach 123
 test
 end_of_test_case
 Test Case 18: 
-Command:./a.out -f dest.txt -f aest.txt test.txt 
+Command:./s21_grep -f dest.txt -f aest.txt test.txt 
 ttest test test 
 one two three one onne 
 peach peachh apple 
@@ -121,7 +121,7 @@ peach 123
 test
 end_of_test_case
 Test Case 19: 
-Command:./a.out test.txt -f dest.txt -f aest.txt 
+Command:./s21_grep test.txt -f dest.txt -f aest.txt 
 ttest test test 
 one two three one onne 
 peach peachh apple 
@@ -129,35 +129,35 @@ peach 123
 test
 end_of_test_case
 Test Case 20: 
-Command:./a.out -l test dest.txt test.txt  
+Command:./s21_grep -l test dest.txt test.txt  
 dest.txt
 test.txt
 end_of_test_case
 Test Case 21: 
-Command:./a.out -l -i Test dest.txt test.txt 
+Command:./s21_grep -l -i Test dest.txt test.txt 
 dest.txt
 test.txt
 end_of_test_case
 Test Case 22: 
-Command:./a.out -n peach aest.txt        
+Command:./s21_grep -n peach aest.txt        
 2:peach
 3:peach peach peach
 end_of_test_case
 Test Case 23: 
-Command:./a.out -n test dest.txt test.txt 
+Command:./s21_grep -n test dest.txt test.txt 
 dest.txt:8:test ttest
 test.txt:1:ttest test test 
 test.txt:5:test
 end_of_test_case
 Test Case 24: 
-Command:./a.out -h peach aest.txt test.txt  
+Command:./s21_grep -h peach aest.txt test.txt  
 peach
 peach peach peach
 peach peachh apple 
 peach 123
 end_of_test_case
 Test Case 25: 
-Command:./a.out -h peach aest.txt test.txt notexist.txt 
+Command:./s21_grep -h peach aest.txt test.txt notexist.txt 
 peach
 peach peach peach
 peach peachh apple 
@@ -165,36 +165,36 @@ peach 123
 s21_grep: notexist.txt: No such file or directory
 end_of_test_case
 Test Case 26: 
-Command:./a.out -i peacH aest.txt test.txt  
+Command:./s21_grep -i peacH aest.txt test.txt  
 aest.txt:peach
 aest.txt:peach peach peach
 test.txt:peach peachh apple 
 test.txt:peach 123
 end_of_test_case
 Test Case 27: 
-Command:./a.out -h -s peach aest.txt test.txt notexist.txt 
+Command:./s21_grep -h -s peach aest.txt test.txt notexist.txt 
 peach
 peach peach peach
 peach peachh apple 
 peach 123
 end_of_test_case
 Test Case 28: 
-Command: ./a.out -s
+Command: ./s21_grep -s
 
 end_of_test_case
 Test Case 29: 
-Command: ./a.out -s -f notexist.txt test.txt
+Command: ./s21_grep -s -f notexist.txt test.txt
 
 end_of_test_case
 Test Case 30: 
-Command: ./a.out -o test test.txt
+Command: ./s21_grep -o test test.txt
 test
 test
 test
 test
 end_of_test_case
 Test Case 31: 
-Command: ./a.out -o peach test.txt aest.txt 
+Command: ./s21_grep -o peach test.txt aest.txt 
 test.txt:peach
 test.txt:peach
 test.txt:peach
@@ -204,53 +204,53 @@ aest.txt:peach
 aest.txt:peach
 end_of_test_case
 Test Case 32: 
-Command: ./a.out -cv peach test.txt aest.txt
+Command: ./s21_grep -cv peach test.txt aest.txt
 test.txt:3
 aest.txt:1
 end_of_test_case
 Test Case 33: 
-Command: ./a.out -cv peach test.txt         
+Command: ./s21_grep -cv peach test.txt         
 3
 end_of_test_case
 Test Case 34: 
-Command: ./a.out -cvilnos peach test.txt 
+Command: ./s21_grep -cvilnos peach test.txt 
 1
 test.txt
 end_of_test_case
 Test Case 35: 
-Command: ./a.out -cvilnos peach test.txt aest.txt notexist.txt
+Command: ./s21_grep -cvilnos peach test.txt aest.txt notexist.txt
 test.txt:1
 test.txt
 aest.txt:1
 aest.txt
 end_of_test_case
 Test Case 36: 
-Command: ./a.out -vilno peach  test.txt aest.txt notexist.txt 
+Command: ./s21_grep -vilno peach  test.txt aest.txt notexist.txt 
 test.txt
 aest.txt
 s21_grep: notexist.txt: No such file or directory
 end_of_test_case
 Test Case 37: 
-Command: ./a.out -e one -f aest.txt test.txt 
+Command: ./s21_grep -e one -f aest.txt test.txt 
 one two three one onne 
 peach peachh apple 
 peach 123
 end_of_test_case
 Test Case 38: 
-Command: ./a.out -l -n -o peach test.txt aest.txt notexist.txt
+Command: ./s21_grep -l -n -o peach test.txt aest.txt notexist.txt
 test.txt
 aest.txt
 s21_grep: notexist.txt: No such file or directory
 end_of_test_case
 Test Case 39: 
-Command: ./a.out -h -v -n peach test.txt aest.txt 
+Command: ./s21_grep -h -v -n peach test.txt aest.txt 
 1:ttest test test 
 2:one two three one onne 
 5:test
 1:test 111
 end_of_test_case
 Test Case 40: 
-Command: ./a.out -h -v -n -l peach test.txt aest.txt
+Command: ./s21_grep -h -v -n -l peach test.txt aest.txt
 test.txt
 aest.txt
 end_of_test_case

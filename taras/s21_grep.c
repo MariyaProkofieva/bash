@@ -2,15 +2,18 @@
 
 void parser(flags *fl, int argc, char *argv[]);
 void process_file(char *filename, char **pattern, flags fl);
+void grep_for_file(FILE *file, flags fl, char *filename, regex_t *regex);
+int is_match(flags *fl, char *line, char *filename, regex_t *regex, int number_line);
 void compile_reg(regex_t *regex, char **pattern, flags fl);
 void change_linebreak(char *line);
 void add_template_file(flags *fl, char *template_file);
-int is_match(flags *fl, char *line, char *filename, regex_t *regex, int number_line);
 void process_flag_c(flags *fl, int match_count, int dismatch_count, char *filename);
 void process_line(flags *fl, char *filename, char *line, int match, int number_line);
+void process_invalid_input(flags *fl);
 void print_filename(flags *fl, char *filename);
 void print_number(flags *fl, int number_line);
 void add_newline_pattern(flags *fl, char *line, size_t length);
+void parse_flag_e(flags *fl);
 
 
 int main(int argc, char *argv[])
@@ -26,23 +29,18 @@ int main(int argc, char *argv[])
     {
         if (argc > 2)
         {
-            
             fl.patterns[fl.counter_patterns] = malloc((strlen(argv[optind]) + 1) * sizeof(char));
             strcpy(fl.patterns[fl.counter_patterns], argv[optind]);
             fl.counter_patterns++;
             optind++;
         }
-        else if (!fl.s)
+        else
         {
-            printf("Missing arguments\n");
-        }
+            if (!fl.s) {
+                printf("Missing arguments\n");
+            }
             exit(1);
-        
-    }
-
-    for (int i = 0; i < argc; i++)
-    {
-        input_files[i] = NULL;
+        }
     }
 
     for (int i = optind, n = 0; i < argc; i++, n++)
@@ -51,19 +49,19 @@ int main(int argc, char *argv[])
         strcpy(input_files[n], argv[i]);
         fl.counter_files++;
     }
-    
 
     for (int i = optind; i < argc; i++)
     { 
-
         process_file(argv[i], fl.patterns, fl);
     }
 
-    for(int i = 0; i<fl.counter_patterns; i++){
+    for(int i = 0; i<fl.counter_patterns; i++)
+    {
         free(fl.patterns[i]);
     }
 
-    for(int i = 0; i<fl.counter_files; i++){
+    for(int i = 0; i<fl.counter_files; i++)
+    {
         free(fl.input_files[i]);
     }
     return 0;
@@ -80,16 +78,8 @@ void parser(flags *fl, int argc, char *argv[])
         opt = getopt_long(argc, argv, "e:f:ivclnhso", NULL, &loginindex); 
         switch (opt)
         {
-
         case 'e':
-            fl->e = 1;
-            fl->patterns[fl->counter_patterns] = malloc((strlen(optarg) + 1) * sizeof(char)); 
-            if (fl->patterns[fl->counter_patterns] == NULL)
-            {
-                exit(1);
-            }
-            strcpy(fl->patterns[fl->counter_patterns], optarg);
-            fl->counter_patterns++;
+            parse_flag_e(fl);
             break;
         case 'i':
             fl->i = 1;
@@ -120,20 +110,35 @@ void parser(flags *fl, int argc, char *argv[])
             fl->o = 1;
             break;
         case '?':
-            if(!fl->s && optopt!='e'){
-                printf("s21_grep: invalid option -- %c\n", optopt);
-                printf("usage: s21_grep [-chilnsvo]\n");
-                printf("[-e pattern] [-f file]\n");
-            }
-
-            if(!fl->s && optopt=='e'){
-                printf("s21_grep: option requires an argument -- e\n");
-                printf("usage: s21_grep [-chilnsvo]\n");
-                printf("[-e pattern] [-f file]\n");
-            }
-            exit (1);
+            process_invalid_input(fl);
         }
     }
+}
+
+void parse_flag_e(flags *fl) {
+    fl->e = 1;
+    fl->patterns[fl->counter_patterns] = malloc((strlen(optarg) + 1) * sizeof(char)); 
+    if (fl->patterns[fl->counter_patterns] == NULL)
+    {
+        exit(1);
+    }
+    strcpy(fl->patterns[fl->counter_patterns], optarg);
+    fl->counter_patterns++;
+}
+
+void process_invalid_input(flags *fl) {
+    if(!fl->s && optopt!='e'){
+        printf("s21_grep: invalid option -- %c\n", optopt);
+        printf("usage: s21_grep [-chilnsvo]\n");
+        printf("[-e pattern] [-f file]\n");
+    }
+
+    if(!fl->s && optopt=='e'){
+        printf("s21_grep: option requires an argument -- e\n");
+        printf("usage: s21_grep [-chilnsvo]\n");
+        printf("[-e pattern] [-f file]\n");
+    }
+    exit (1);
 }
 
 void add_template_file(flags *fl, char *template_file)
@@ -145,7 +150,7 @@ void add_template_file(flags *fl, char *template_file)
     if (!file)
     {
         if(!fl->s){
-        printf("s21_grep: %s: No such file or directory\n", template_file);
+            printf("s21_grep: %s: No such file or directory\n", template_file);
         }
         return;
     }
@@ -166,25 +171,32 @@ void add_template_file(flags *fl, char *template_file)
 
 void process_file(char *filename, char **pattern, flags fl)
 {
-
     FILE *file = fopen(filename, "r");
-    char *line = NULL;
-    size_t length = 0;
-    int match_count = 0; 
-    int dismatch_count = 0;
     regex_t regex[10000];
-    int number_line = 0;
-    int flag_match = 0;
     if (file == NULL)
     {
         if(!fl.s){
-        printf("s21_grep: %s: No such file or directory\n", filename);
+            printf("s21_grep: %s: No such file or directory\n", filename);
         }
         return;
     }
     compile_reg(regex, pattern, fl);
-    
+    grep_for_file(file, fl, filename, regex);
 
+    for (int i = 0; i < fl.counter_patterns; i++){
+        regfree(&regex[i]);
+    }
+    fclose(file);
+}
+
+void grep_for_file(FILE *file, flags fl, char *filename, regex_t *regex) {
+    char *line = NULL;
+    size_t length = 0;
+    int number_line = 0;
+    int match_count = 0; 
+    int dismatch_count = 0;
+    int flag_match = 0;
+    
     while ((getline(&line, &length, file)) != -1)
     {   
         number_line++;
@@ -200,6 +212,7 @@ void process_file(char *filename, char **pattern, flags fl)
             process_line(&fl, filename, line, match, number_line);
         }
     }
+    free(line);
 
     if(fl.c){
         process_flag_c(&fl, match_count, dismatch_count, filename);
@@ -208,13 +221,6 @@ void process_file(char *filename, char **pattern, flags fl)
     if(fl.l && flag_match){
         printf("%s\n", filename);
     }
-    
-    for (int i = 0; i < fl.counter_patterns; i++){
-    regfree(&regex[i]);
-    }
-    free(line);
-    fclose(file);
-    
 }
 
 void compile_reg(regex_t *regex, char **pattern, flags fl)
@@ -231,7 +237,6 @@ void compile_reg(regex_t *regex, char **pattern, flags fl)
 
 void change_linebreak(char *line)
 {
-
     int end_str = (int)strlen(line) - 1;
     if (line[end_str] == '\n')
     {
@@ -247,21 +252,21 @@ int is_match(flags *fl, char *line, char *filename, regex_t *regex, int number_l
     regmatch_t regmatch; 
     for (int i = 0; i < fl->counter_patterns; i++)
     {
-        if (!regexec(&regex[i], line, 1, &regmatch, 0))
-        {
+        if (!regexec(&regex[i], line, 1, &regmatch, 0)) {
             match = 1;
-            if (fl->o && !fl->c && !fl->v && !fl->l)
-            {   
-                char *cutted_line = line + regmatch.rm_eo;
+        }
+
+        if (match && fl->o && !fl->c && !fl->v && !fl->l)
+        {   
+            char *cutted_line = line + regmatch.rm_eo;
+            print_filename(fl, filename);
+            print_number(fl, number_line);
+            printf("%s\n", fl->patterns[i]);
+            while (!regexec(&regex[i], cutted_line, 1, &regmatch, 0)) {
+                cutted_line += regmatch.rm_eo;
                 print_filename(fl, filename);
                 print_number(fl, number_line);
                 printf("%s\n", fl->patterns[i]);
-                while (!regexec(&regex[i], cutted_line, 1, &regmatch, 0)) {
-                    cutted_line += regmatch.rm_eo;
-                    print_filename(fl, filename);
-                    print_number(fl, number_line);
-                    printf("%s\n", fl->patterns[i]);
-                }               
             }
         }
        
@@ -308,12 +313,11 @@ void process_flag_c(flags *fl, int match_count, int dismatch_count, char *filena
 
 void print_number(flags *fl, int number_line){
     if(fl->n && !fl->c){
-    printf("%d:", number_line);
+        printf("%d:", number_line);
     }
 }
 
 void add_newline_pattern(flags *fl, char *line, size_t length){
-
     fl->patterns[fl->counter_patterns] = malloc((length+1) * sizeof(char));
     strcpy(fl->patterns[fl->counter_patterns], line);
     fl->counter_patterns++;

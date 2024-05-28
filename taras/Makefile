@@ -7,7 +7,9 @@ s21_grep:
 	$(CC) $(CFLAGS) s21_grep.c -o s21_grep
 	
 test:
-	bash grep_test.sh
+	sh grep_test.sh
 
 clean:
 	rm -rf s21_grep 
+
+rebuild: clean s21_grep test
