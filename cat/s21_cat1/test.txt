@@ -1,0 +1,6 @@
+ The term "cat" stands for
+concatenate," reflecting its capability to
+
+ 		join together the contents of several
+ 
+ files into one continuous stream of data.

@@ -1,0 +1,315 @@
+Test Case 1
+Command:./s21_cat -b -e -n -s -t test.txt dest.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F ^I^Ijoin together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.     1	^? ^^ ^_ ^K ^L ^Y ^X ^W ^V ^U ^T$
+     2	\!,\?%\:#\\\ \\ \ \^I^I\\\\\\$
+      	$
+     3	\/|\)(\&$\\\ \\ \ \    \\\\\$
+      	$
+     4	In Bash, the cat command is a versatile tool used for displaying $
+     5	the contents of files or concatenating multiple files and displaying $
+     6	                their combined output. $
+     7	^I$
+end_of_test_case
+Test Case 2
+Command:./s21_cat -b -e -n -s -t test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F ^I^Ijoin together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 3
+Command:./s21_cat -e -n -s -t test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+     3	$
+     4	^F ^I^Ijoin together the contents of several$
+     5	^G $
+     6	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 4
+Command:./s21_cat -n -s -t test.txt
+     1	^E The term "cat" stands for
+     2	concatenate," reflecting its capability to
+     3	
+     4	^F ^I^Ijoin together the contents of several
+     5	^G 
+     6	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 5
+Command:./s21_cat -s -t test.txt
+^E The term "cat" stands for
+concatenate," reflecting its capability to
+
+^F ^I^Ijoin together the contents of several
+^G 
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 6
+Command:./s21_cat -t test.txt
+^E The term "cat" stands for
+concatenate," reflecting its capability to
+
+^F ^I^Ijoin together the contents of several
+^G 
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 7
+Command:./s21_cat -s test.txt
+ The term "cat" stands for
+concatenate," reflecting its capability to
+
+ 		join together the contents of several
+ 
+ files into one continuous stream of data.
+end_of_test_case
+Test Case 8
+Command:./s21_cat -n test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+     3	
+     4	 		join together the contents of several
+     5	 
+     6	 files into one continuous stream of data.
+end_of_test_case
+Test Case 9
+Command:./s21_cat -e test.txt
+^E The term "cat" stands for$
+concatenate," reflecting its capability to$
+$
+^F 		join together the contents of several$
+^G $
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 10
+Command:./s21_cat -b test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	 		join together the contents of several
+     4	 
+     5	 files into one continuous stream of data.
+end_of_test_case
+Test Case 11
+Command:./s21_cat -v test.txt
+^E The term "cat" stands for
+concatenate," reflecting its capability to
+
+^F 		join together the contents of several
+^G 
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 12
+Command:./s21_cat -v -e test.txt
+^E The term "cat" stands for$
+concatenate," reflecting its capability to$
+$
+^F 		join together the contents of several$
+^G $
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 13
+Command:./s21_cat -v -t test.txt
+^E The term "cat" stands for
+concatenate," reflecting its capability to
+
+^F ^I^Ijoin together the contents of several
+^G 
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 14
+Command:./s21_cat --number-nonblank test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	 		join together the contents of several
+     4	 
+     5	 files into one continuous stream of data.
+end_of_test_case
+Test Case 15
+Command:./s21_cat --number test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+     3	
+     4	 		join together the contents of several
+     5	 
+     6	 files into one continuous stream of data.
+end_of_test_case
+Test Case 16
+Command:./s21_cat --squeeze-blank test.txt
+ The term "cat" stands for
+concatenate," reflecting its capability to
+
+ 		join together the contents of several
+ 
+ files into one continuous stream of data.
+end_of_test_case
+Test Case 17
+Command:./s21_cat -b -e -n -s test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F 		join together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 18
+Command:./s21_cat -b -e -n test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F 		join together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 19
+Command:./s21_cat -b -e test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F 		join together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 20
+Command:./s21_cat empty.txt
+
+end_of_test_case
+Test Case 21
+Command:./s21_cat -b -e -n -s -t empty.txt
+
+end_of_test_case
+Test Case 22
+Command:./s21_cat -n -s -t -b -e test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F ^I^Ijoin together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 23
+Command:./s21_cat -t -n -b -e -s test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F ^I^Ijoin together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 24
+Command:./s21_cat -n -e test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+     3	$
+     4	^F 		join together the contents of several$
+     5	^G $
+     6	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 25
+Command:./s21_cat -b -e test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F 		join together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 26
+Command:./s21_cat -b -n test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	 		join together the contents of several
+     4	 
+     5	 files into one continuous stream of data.
+end_of_test_case
+Test Case 27
+Command:./s21_cat -b -s test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	 		join together the contents of several
+     4	 
+     5	 files into one continuous stream of data.
+end_of_test_case
+Test Case 28
+Command:./s21_cat -n -s test.txt
+     1	 The term "cat" stands for
+     2	concatenate," reflecting its capability to
+     3	
+     4	 		join together the contents of several
+     5	 
+     6	 files into one continuous stream of data.
+end_of_test_case
+Test Case 29
+Command:./s21_cat -benst test.txt
+     1	^E The term "cat" stands for$
+     2	concatenate," reflecting its capability to$
+      	$
+     3	^F ^I^Ijoin together the contents of several$
+     4	^G $
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 30
+Command:./s21_cat -v -n test.txt
+     1	^E The term "cat" stands for
+     2	concatenate," reflecting its capability to
+     3	
+     4	^F 		join together the contents of several
+     5	^G 
+     6	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 31
+Command:./s21_cat -v -s test.txt
+^E The term "cat" stands for
+concatenate," reflecting its capability to
+
+^F 		join together the contents of several
+^G 
+^H files into one continuous stream of data.
+end_of_test_case
+Test Case 32
+Command:./s21_cat -v -b test.txt
+     1	^E The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	^F 		join together the contents of several
+     4	^G 
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 33
+Command:./s21_cat -v -b -s test.txt
+     1	^E The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	^F 		join together the contents of several
+     4	^G 
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 34
+Command:./s21_cat -v -b -s -n test.txt
+     1	^E The term "cat" stands for
+     2	concatenate," reflecting its capability to
+
+     3	^F 		join together the contents of several
+     4	^G 
+     5	^H files into one continuous stream of data.
+end_of_test_case
+Test Case 35
+Command:./s21_cat -v -b -s -n notexist.txt
+s21_cat: notexist.txt: No such file or directory
+end_of_test_case
+Test Case 36
+Command:./s21_cat 
+Missing arguments
+end_of_test_case
+
+   printf("s21_cat: illegal option -- %c\n", optopt);
+                printf("usage: s21_cat [-benstv] [file ...]\n");

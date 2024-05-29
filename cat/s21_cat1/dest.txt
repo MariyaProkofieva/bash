@@ -1,0 +1,11 @@
+          
+\!,\?%\:#\\\ \\ \ \		\\\\\\
+
+\/|\)(\&$\\\ \\ \ \    \\\\\
+
+
+
+In Bash, the cat command is a versatile tool used for displaying 
+the contents of files or concatenating multiple files and displaying 
+                their combined output. 
+	
