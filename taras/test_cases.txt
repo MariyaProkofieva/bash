@@ -1,15 +1,15 @@
-command:
-./a.out peach test.txt dest.txt empty.txt
-result:
+Test Case 1:
+Command:./a.out peach test.txt dest.txt empty.txt
+Expected Results:
 test.txt:peach peachh apple 
 test.txt:peach 123
 dest.txt:        peach 
 dest.txt:!peach123
 
 
-command:
-./a.out peach notexist.txt test.txt dest.txt empty.txt
-result:
+Test Case 2:
+Command:./a.out peach notexist.txt test.txt dest.txt empty.txt
+Expected Results:
 s21_grep: notexist.txt: No such file or directory
 test.txt:peach peachh apple 
 test.txt:peach 123
@@ -17,44 +17,44 @@ dest.txt:        peach
 dest.txt:!peach123
 
 
-command:
-./a.out peach
-result: 
+Test Case 3:
+Command:./a.out peach
+Expected Results: 
 error
 
 
-command:
-./a.out -c peach test.txt
-result:
+Test Case 4:
+Command:./a.out -c peach test.txt
+Expected Results:
 2
 
 
-command:
-./a.out -c peach test.txt dest.txt 
-result:
+Test Case 5:
+Command:./a.out -c peach test.txt dest.txt 
+Expected Results:
 test.txt:2
 dest.txt:2
 
 
-command:
-./a.out -c peach test.txt dest.txt empty.txt 
-result:
+Test Case 6:
+Command:./a.out -c peach test.txt dest.txt empty.txt 
+Expected Results:
 test.txt:2
 dest.txt:2
 empty.txt:0
 
 
-command:
-./a.out -v peach test.txt
-result:                    
+Test Case 7:
+Command:./a.out -v peach test.txt
+Expected Results:                    
 ttest test test 
 one two three one onne 
 test
 
 
-command:
-./a.out -v peach test.txt dest.txt 
-result:
+Test Case 8:
+Command:./a.out -v peach test.txt dest.txt 
+Expected Results:
 test.txt:ttest test test 
 test.txt:one two three one onne 
 test.txt:test
@@ -69,33 +69,33 @@ dest.txt:
 dest.txt:
 
 
-command:
-./a.out -v peach test.txt empty.txt 
-result:
+Test Case 9:
+Command:./a.out -v peach test.txt empty.txt 
+Expected Results:
 test.txt:ttest test test 
 test.txt:one two three one onne 
 test.txt:test
 
 
-command:
-./a.out -e peach test.txt
-result:
+Test Case 10:
+Command:./a.out -e peach test.txt
+Expected Results:
 peach peachh apple 
 peach 123
 
 
-command: OK
-./a.out -e peach -e test test.txt
-result:
+Test Case 11: 
+Command:./a.out -e peach -e test test.txt
+Expected Results:
 ttest test test 
 peach peachh apple 
 peach 123
 test
 
 
-command: OK
-./a.out -e peach -e test -e pea  test.txt dest.txt 
-result:
+Test Case 12: 
+Command:./a.out -e peach -e test -e pea  test.txt dest.txt 
+Expected Results:
 test.txt:ttest test test 
 test.txt:peach peachh apple 
 test.txt:peach 123
@@ -106,39 +106,39 @@ dest.txt:test ttest
 dest.txt:!peach123
 
 
-command: OK
-./a.out test.txt -e test  
-result:
+Test Case 13: 
+Command:./a.out test.txt -e test  
+Expected Results:
 ttest test test 
 test
 
 
-command: OK
-./a.out test.txt -e test -e one
-result:
-ttest test test 
-one two three one onne 
-test
-
-
-command: OK
-./a.out  -e test test.txt  -e one 
-result:
+Test Case 14: 
+Command:./a.out test.txt -e test -e one
+Expected Results:
 ttest test test 
 one two three one onne 
 test
 
 
-command: OK
-./a.out -e test test.txt empty.txt 
-result:
+Test Case 15: 
+Command:./a.out  -e test test.txt  -e one 
+Expected Results:
+ttest test test 
+one two three one onne 
+test
+
+
+Test Case 16: 
+Command:./a.out -e test test.txt empty.txt 
+Expected Results:
 test.txt:ttest test test 
 test.txt:test
 
 
-command: OK
-./a.out -f dest.txt test.txt
-result:
+Test Case 17: 
+Command:./a.out -f dest.txt test.txt
+Expected Results:
 
 ttest test test 
 one two three one onne 
@@ -147,9 +147,9 @@ peach 123
 test
 
 
-command: OK
-./a.out -f dest.txt -f aest.txt test.txt 
-result:
+Test Case 18: 
+Command:./a.out -f dest.txt -f aest.txt test.txt 
+Expected Results:
 
 ttest test test 
 one two three one onne 
@@ -158,9 +158,9 @@ peach 123
 test
 
 
-command: OK
-./a.out test.txt -f dest.txt -f aest.txt 
-result:
+Test Case 19: 
+Command:./a.out test.txt -f dest.txt -f aest.txt 
+Expected Results:
 
 ttest test test 
 one two three one onne 
@@ -169,39 +169,67 @@ peach 123
 test
 
 
-command: OK
-./a.out -l test dest.txt test.txt  
-result:
+Test Case 20: 
+Command:./a.out -l test dest.txt test.txt  
+Expected Results:
 dest.txt
 test.txt
 
 
-command: OK
-./a.out -l -i Test dest.txt test.txt 
-result:
+Test Case 21: 
+Command:./a.out -l -i Test dest.txt test.txt 
+Expected Results:
 dest.txt
 test.txt
 
 
-command: OK
-./a.out -n peach aest.txt        
-result:
+Test Case 22: 
+Command:./a.out -n peach aest.txt        
+Expected Results:
 2:peach
 3:peach peach peach
 
 
-command: OK
-/a.out -n test dest.txt test.txt 
-result:
+Test Case 23: 
+Command:./a.out -n test dest.txt test.txt 
+Expected Results:
 dest.txt:8:test ttest
 test.txt:1:ttest test test 
 test.txt:5:test
 
 
-command: OK
-./a.out -h peach aest.txt test.txt 
-result: 
+Test Case 24: 
+Command:./a.out -h peach aest.txt test.txt 
+Expected Results: 
 peach
 peach peach peach
 peach peachh apple 
 peach 123
+
+Test Case 25: 
+Command:./a.out -h peach aest.txt test.txt notexist.txt 
+peach
+peach peach peach
+peach peachh apple 
+peach 123
+s21_grep: notexist.txt: No such file or directory
+
+Test Case 26: 
+Command:./a.out -i peacH aest.txt test.txt  
+aest.txt:peach
+aest.txt:peach peach peach
+test.txt:peach peachh apple 
+test.txt:peach 123
+
+Test Case 27: 
+Command:./a.out -h -s peach aest.txt test.txt notexist.txt 
+peach
+peach peach peach
+peach peachh apple 
+peach 123
+
+Test Case 28: 
+Command: ./a.out -s
+
+
+
